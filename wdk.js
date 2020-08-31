@@ -141,7 +141,7 @@ function createClearMessage() {
   //ツイートボタンのDOM生成
   document.getElementById("tweetBtn").innerHTML =
       '<a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-size="large"data-text="' +
-      clearMessage +" "+getURL() + '" data-hashtags="#にくわどう謎">Tweet</a>';
+      clearMessage + '" data-hashtags="にくわどう謎">Tweet</a>';
 
   //ツイートボタン再構築
   twttr.widgets.load();
