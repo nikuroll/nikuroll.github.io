@@ -29,6 +29,7 @@ function setup() {
   image(gazo, width/2, height/2);
   nowmode=0;
   textSize(100);
+  tweet = createElement()
   noLoop();
 
 }
@@ -55,7 +56,15 @@ function draw() {
   
   //中心反転
   push()
-  applyMatrix(cos(angle),0,0,1,width/2-250,height/2);
+  let a=1;
+  if(Math.floor(step/50)%2==0){
+    var newstep=100/(1+exp(-1*(step%100-25)*a));
+    var newangle= map(newstep, 0, 100, 0, PI);
+  }else{
+    var newstep=100/(1+exp(-1*(step%100-75)*a));
+    var newangle=map(newstep, 0, 100, PI, 0);
+  }
+  applyMatrix(cos(newangle),0,0,1,width/2-250,height/2);
   image(k2, 0, 0);
   pop()
 
@@ -104,6 +113,7 @@ function nextStage(){
   nowmode+=1;
   if(nowmode==2){
     check=frameCount;
+    createClearMessage();
   }
 }
 
@@ -123,4 +133,16 @@ function keyPressed(){
   if(keyCode==13){
     checkAns();
   }
+}
+
+function createClearMessage() {
+  const clearMessage = "なんか解けた！";
+
+  //ツイートボタンのDOM生成
+  document.getElementById("tweetBtn").innerHTML =
+      '<a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-size="large"data-text="' +
+      clearMessage +" "+getURL() + '" data-hashtags="#にくわどう謎">Tweet</a>';
+
+  //ツイートボタン再構築
+  twttr.widgets.load();
 }
