@@ -119,6 +119,7 @@ function mod(i,j){
   return i%j<0 ? (i%j)+0+(j<0? -j: j) : (i % j + 0);
 }
 
+/*
 function mouseClicked(){
   let x = mouseX-width/2;
   let y = mouseY-height/2;
@@ -128,6 +129,7 @@ function mouseClicked(){
     quake+=100;
   }
 }
+*/
 
 function touchStarted(){
   /*
