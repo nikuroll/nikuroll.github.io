@@ -128,3 +128,17 @@ function mouseClicked(){
     quake+=100;
   }
 }
+
+function touchStarted(){
+  /*
+  if(touches.length > 0){
+    let x = mouseX-width/2;
+    let y = mouseY-height/2;
+    let dis = x*x+y*y;
+    if(96*96<dis && dis<320*320){
+      */
+      limit-=8;
+      quake+=100;
+  /*  }
+  }*/
+}
