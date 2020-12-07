@@ -1,6 +1,7 @@
 var Planets=[];
 var N = 10
 var cleared=false;
+var old=0;
 Planet.N=N;
 
 function setup(){
@@ -94,6 +95,24 @@ function gameclear(){
 }
 
 function draw(){
+  if(old==0 && touches.length==1){
+    old=1;
+    for(let i=0;i<N;i++){
+      if(Planets[i].touchcheck()){
+        /*process*/
+        //Planets[i].mycolor=color(100,0,0);
+        let nex=Planets[i].eso1();
+        PlanetSwap(i,nex)
+        Planets[i].eso2(i);
+        break;
+      }
+    }
+    back();
+    showPlanets();
+    gameclear();
+  }else if(old==1 && touches.length==0){
+    old=0;
+  }
   for(let i=0;i<N;i++){
     Planets[i].update();
   }

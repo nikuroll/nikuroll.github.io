@@ -25,6 +25,15 @@ class Planet{
       return false;
     }
   }
+  touchcheck(){
+    mX=touches[0].x;
+    mY=touches[0].y;
+    if((mX-this.x)*(mX-this.x)+(mY-150)*(mY-150)<this.d*this.d){
+      return true;
+    }else{
+      return false;
+    }
+  }
   eso1(){
     this.p=(this.p+this.id)%N;
     return this.p;
