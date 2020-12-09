@@ -76,6 +76,8 @@ class undoArr{
 }
 var myundoArr = new undoArr;
 
+
+
 function cango(x,y){
   if (x<0 || y<0 || x>=9 || y>=9){
     return false;
@@ -83,11 +85,12 @@ function cango(x,y){
   return true;
 }
 
+
 function setup(){
-  createCanvas(400, 400);
+  createCanvas(600, 400);
   background(128);
   strokeWeight(3);
-
+  sdraw();
 }
 
 let board = [
@@ -102,7 +105,97 @@ let board = [
   [0,0,0,0,0,0,0,0,0]
  ];
 
- function draw(){
+function colBoard(){
+  let colb = [
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0]
+   ];
+   for(i=0;i<9;i++){
+     let nlis=[0,0,0,0,0,0,0,0,0];
+     let flg=0;
+     for(q=0;q<9;q++){
+       if(board[i][q]){
+         if(nlis[board[i][q]-1]++){
+           flg=1;
+           break;
+         }
+       }
+     }
+     if(flg){
+      for(q=0;q<9;q++){
+        colb[i][q]=1;
+      }
+    }
+   }
+   for(q=0;q<9;q++){
+    let nlis=[0,0,0,0,0,0,0,0,0];
+    let flg=0;
+    for(i=0;i<9;i++){
+      if(board[i][q]){
+        if(nlis[board[i][q]-1]++){
+          flg=1;
+          break;
+        }
+      }
+    }
+    if(flg){
+     for(i=0;i<9;i++){
+       colb[i][q]=1;
+     }
+   }
+  }
+  for(i=0;i<9;i++){
+    let nlis=[0,0,0,0,0,0,0,0,0];
+    let flg=0;
+    for(q=0;q<9;q++){
+      if(board[(i/3|0)*3+(q/3|0)][i%3*3+q%3]){
+        if(nlis[board[(i/3|0)*3+(q/3|0)][i%3*3+q%3]-1]++){
+          flg=1;
+          break;
+        }
+      }
+    }
+    if(flg){
+      
+     for(q=0;q<9;q++){
+       colb[(i/3|0)*3+(q/3|0)][i%3*3+q%3]=1;
+     }
+   }
+  }
+   return colb;
+}
+
+class Score{
+  constructor(){
+    this.score=this.calc(board);
+  }
+  calc(b){
+    let cnt=0;
+    for(let i=0;i<9;i++){
+      for(let q=0;q<9;q++){
+        if(b[i][q])cnt++;
+      }
+    }
+    return cnt;
+  }
+  show(){
+    this.score=this.calc(board);
+    fill(255);
+    textSize(50);
+    text("SCORE",400,50,200,200);
+    text(str(this.score),400,100,200,200);
+  }
+}
+var myScore=new Score;
+
+ function sdraw(){
   let i=0;
   let q=0; 
   background(128);
@@ -110,10 +203,11 @@ let board = [
   textAlign(CENTER,CENTER);
   //applyMatrix(.5, 0, 0, .5, 0, 0);
   strokeWeight(3);
+  let CB=colBoard();
   for(i=0;i<9;i++){
     for(q=0;q<9;q++){
       //fill(i*30-q*15+100);
-      fill(255);
+      fill(255,255-CB[i][q]*255,255-CB[i][q]*255);
       rect(20+40*i,20+40*q,40,40);
       fill(0);
       if(board[i][q]){
@@ -130,7 +224,22 @@ let board = [
     }
   }
   strokeWeight(3);
-  me.show()
+  me.show();
+  myScore.show();
+
+  if(myScore.score==81){
+    textSize(60);
+    fill(0);
+    text("Clear!",327,77,360,360);
+    fill(255);
+    text("Clear!",322,72,360,360);
+    fill(255,100,100);
+    text("Clear!",325,75,360,360);
+  }
+ }
+
+ function draw(){
+   //sdraw();
  }
 
  function Comp(){
@@ -143,7 +252,7 @@ let board = [
    Computer();
    if (RESULT==2){
      fill(0,128);
-     rect(0,0,width,height);
+     //rect(0,0,width,height);
    }
    for (y=0; y<9; y++){
     for (x=0; x<9; x++){
@@ -195,28 +304,29 @@ let board = [
    if(keyCode===LEFT_ARROW){
      makeMemory();
      me.left();
+     sdraw();
      Comp();
-     return 0;
    }
    if(keyCode===RIGHT_ARROW){
     makeMemory();
     me.right();
+    sdraw();
     Comp();
-    return 0;
   }
   if(keyCode===UP_ARROW){
     makeMemory();
     me.up();
+    sdraw();
     Comp();
-    return 0;
   }
   if(keyCode===DOWN_ARROW){
     makeMemory();
     me.down();
+    sdraw();
     Comp();
-    return 0;
   }
   if(keyCode==90){
     getundo();
   }
+  sdraw();
  }
