@@ -1,3 +1,10 @@
+//画面のスクロールについて
+// スクロールを禁止する関数
+function noScroll(event) {
+  event.preventDefault();
+}
+document.addEventListener('touchmove', noScroll, { passive: false });
+
 //-----------------------------------------------
 // グローバル変数定義
 //-----------------------------------------------
