@@ -2,6 +2,7 @@ let mic;
 let img;
 let imgs=[];
 let now=0;
+let startflg=0;
 // setup()より先に呼び出される
 function preload() {
     let i=1;
@@ -15,17 +16,27 @@ function preload() {
 
 function setup() {
   createCanvas(600, 600);
+  frameRate(15);
+}
 
+function mouseClicked(){
+  if(startflg==1){
+    return;
+  }
   mic = new p5.AudioIn();
   mic.start();
-  frameRate(15);
+  startflg=1;
 }
 
 function draw() {
   background(220);
+  if(startflg==0){
+    text("Touch to Start",50,50,200,200);
+    return;
+  }
 
   let volume = mic.getLevel(); // 0〜1
-  d=volume*180;
+  d=volume*120;
   d = map(d,0.5,180,0,180,true);
   let fram=min(Math.floor(d),12);
   now=Math.floor((now+3*fram)/4);
