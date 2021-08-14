@@ -8,8 +8,7 @@ var YRATE=1.4
 
 function preload(){
   for(let i=0;i<maisu;i++){
-    img[i]= loadImage("tsk2/taisaku%20("+(i+1)+").JPG");
-    //C:\Users\sakurai\Desktop\pppppwork\tokikami\pict2\tokikami\tokikami (8).PNG
+    img[i]= loadImage("tsk2/taisaku%20("+(i+1)+").jpg");
   }
 }
 
