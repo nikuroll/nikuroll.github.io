@@ -4,6 +4,7 @@ let number=0;
 let mousecnt=0;
 let answer="";
 let past=0;
+let button;
 
 function preload(){
     table=loadTable('./data/illustLinkDicSpecial.txt', 'tsv');
@@ -30,9 +31,11 @@ function setup(){
     imageMode(CENTER);
     textSize(40);
 
-    let button = createButton('いらすとやで確認する'); //ボタンの生成
+    button = createButton("いらすとやで確認する");
     button.parent("linkbutton");
-    button.touchStarted(gotoLink)
+    link=table.getString(number,2);
+    button.attribute('onclick',"window.open('"+link+"')");
+    // button.touchStarted(updateLink);
 }
 
 function draw(){
@@ -51,15 +54,16 @@ function draw(){
 
     if (past%60==0 && past>30 && img.width*img.height<100){
         random_choice();
+        updateLink();
     }
     past+=1;
 }
 
-function touchEnded(fxn){
-    if (past<3){
+function touchStarted(fxn){
+    if (past<20){
         return;
     }
-    console.log(mouseX,mouseY);
+    // console.log(mouseX,mouseY);
     if ((0<mouseX && mouseX<width && 0<mouseY && mouseY<height)==false){
         return;
     }
@@ -67,11 +71,15 @@ function touchEnded(fxn){
     mousecnt=1-mousecnt;
     if (mousecnt==0){
         background(128);
-        r=random_choice();
+        random_choice();
+        updateLink();
         
     }
 }
 
-function gotoLink() {
-	window.open(table.getString(number,2));
+function updateLink() {
+	link=table.getString(number,2);
+    button.removeAttribute('onclick');
+    button.attribute('onclick',"window.open('"+link+"')");
+    console.log(link);
 }
