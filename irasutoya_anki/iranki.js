@@ -21,7 +21,7 @@ function random_choice(){
 }
 
 function setup(){
-    let canvas=createCanvas(600,600);
+    let canvas=createCanvas(300,300);
     canvas.parent("canvas");
     background(255);
     r=random_choice();
@@ -29,15 +29,24 @@ function setup(){
     img = loadImage(table.getString(r, 1));
     imageMode(CENTER);
     textSize(40);
+
+    let button = createButton('いらすとやで確認する'); //ボタンの生成
+    button.parent("linkbutton");
+    button.touchStarted(gotoLink)
 }
 
 function draw(){
     background(255);
-    image(img,300,300);
+    noFill();
+    rect(0,0,width-1,height);
+    push();
+    scale(.5);
+    image(img,width,height);
+    pop();
     if (mousecnt==1){
         fill(255,0,0);
-        textSize(500/max(12,answer.length));
-        text(answer,20,500,30,520);
+        textSize(width*.8/max(12,answer.length));
+        text(answer,20,height*.9,30,height*.9);
     }
 
     if (past%60==0 && past>30 && img.width*img.height<100){
@@ -50,6 +59,10 @@ function touchEnded(fxn){
     if (past<3){
         return;
     }
+    console.log(mouseX,mouseY);
+    if ((0<mouseX && mouseX<width && 0<mouseY && mouseY<height)==false){
+        return;
+    }
     past=0;
     mousecnt=1-mousecnt;
     if (mousecnt==0){
@@ -59,3 +72,6 @@ function touchEnded(fxn){
     }
 }
 
+function gotoLink() {
+	window.open(table.getString(number,2));
+}
