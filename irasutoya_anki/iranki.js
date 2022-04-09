@@ -30,6 +30,7 @@ function setup(){
     img = loadImage(table.getString(r, 1));
     imageMode(CENTER);
     textSize(40);
+    frameRate(4);
 
     button = createButton("いらすとやで確認する");
     button.parent("linkbutton");
@@ -52,7 +53,7 @@ function draw(){
         text(answer,20,height*.9,30,height*.9);
     }
 
-    if (past%60==0 && past>30 && img.width*img.height<100){
+    if (past>0 && img.width*img.height<100){
         random_choice();
         updateLink();
     }
@@ -60,7 +61,7 @@ function draw(){
 }
 
 function touchStarted(fxn){
-    if (past<20){
+    if (past<2){
         return;
     }
     // console.log(mouseX,mouseY);
@@ -70,7 +71,9 @@ function touchStarted(fxn){
     past=0;
     mousecnt=1-mousecnt;
     if (mousecnt==0){
-        background(128);
+        background(255);
+        noFill();
+        rect(0,0,width-1,height);
         random_choice();
         updateLink();
         
