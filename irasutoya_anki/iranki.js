@@ -37,7 +37,7 @@ function setup(){
         number=getID;
     }
 
-    if(number){
+    if(0<=number<total){
         r=number;
     }else{
         r=random_choice(num=number);
