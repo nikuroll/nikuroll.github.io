@@ -6,6 +6,7 @@ let answer="";
 let past=0;
 let button;
 let tw_button;
+let total=25235;
 
 function preload(){
     table=loadTable('./data/illustDic3.txt', 'tsv');
@@ -13,7 +14,6 @@ function preload(){
 
 function random_choice(num=-1){
     past=0;
-    let total=25236;
     if (num==-1){
         tar=round(random(1,total-1));
     }else{
@@ -37,7 +37,7 @@ function setup(){
         number=getID;
     }
 
-    if(0<=number<total){
+    if(0<=number && number<total){
         r=number;
     }else{
         r=random_choice(num=number);
