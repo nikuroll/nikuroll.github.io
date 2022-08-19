@@ -42,6 +42,15 @@ strokeCap(SQUARE);
  test0.walk(noise(frameCount*2)*5);
  printMaps();
  useCommand();
+
+ touchdraw();
+}
+
+function touchdraw(){
+    if (mouseIsPressed) {
+        fill(255,255,0);
+        ellipse(mouseX, mouseY, 50, 50);
+      }
 }
 
 class Fish {
@@ -269,3 +278,4 @@ function createClearMessage() {
   //ツイートボタン再構築
   twttr.widgets.load();
 }
+
