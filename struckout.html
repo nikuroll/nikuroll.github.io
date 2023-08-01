@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Struck out</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vh;
+            background-color: #f3f3f3;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .bingo-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-gap: 10px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.5s ease;
+            /* 背景色の変化を0.5秒かけてフェードする */
+
+            height: 130px;
+            width: 130px;
+        }
+
+        .bingo-cell {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .bingo-cell.clicked {
+            background-color: #000000;
+        }
+
+        .clear {
+            clear: both;
+        }
+
+        .reset-button {
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .reset-button:hover {
+            background-color: #45a049;
+        }
+
+        input {
+            caret-color: transparent;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="conteiner">
+        <div class="bingo-board">
+            <!-- ビンゴボードを表示するためのマスの生成 -->
+            <!-- クリックイベントを処理するために各マスに 'bingoCellClicked()' を追加 -->
+            <div class="bingo-cell" onclick="bingoCellClicked(0, 0)"></div>
+            <div class="bingo-cell" onclick="bingoCellClicked(0, 1)"></div>
+            <div class="bingo-cell" onclick="bingoCellClicked(0, 2)"></div>
+            <div class="bingo-cell" onclick="bingoCellClicked(1, 0)"></div>
+            <div class="bingo-cell" onclick="bingoCellClicked(1, 1)"></div>
+            <div class="bingo-cell" onclick="bingoCellClicked(1, 2)"></div>
+            <div class="bingo-cell" onclick="bingoCellClicked(2, 0)"></div>
+            <div class="bingo-cell" onclick="bingoCellClicked(2, 1)"></div>
+            <div class="bingo-cell" onclick="bingoCellClicked(2, 2)"></div>
+        </div>
+
+        <div class="clear"></div>
+
+        <button class="reset-button" onclick="resetGame()">Reset</button>
+        <div id="clicks-remaining"></div>
+        <div id="message"></div>
+
+    </div>
+
+    <script>
+        // ビンゴボードの状態を格納する配列
+        var boardState = [];
+        var maxClicks;
+
+        // ビンゴボードの初期化
+        function initializeBoard() {
+
+            maxClicks = 3;
+
+            // 残りのクリック数の表示
+            var clicksRemainingElement = document.getElementById("clicks-remaining");
+            clicksRemainingElement.textContent = "Balls: " + maxClicks;
+            for (var row = 0; row < 3; row++) {
+                boardState[row] = [];
+                for (var col = 0; col < 3; col++) {
+                    boardState[row][col] = false;
+                }
+            }
+        }
+
+        function getRandomValue() {
+            var values = [-1, 0, 1];
+            var randomIndex = Math.floor(Math.random() * values.length);
+            return values[randomIndex];
+        }
+
+        function getDiff(rem,xy){
+            var turn = 3-rem;
+            var dx=[-2,1,0][turn];
+            var dy=[-1,-1,2][turn];
+
+            if(xy==0) return dx;
+            return dy;
+        }
+
+
+        // マスをクリックしたときの処理
+        function bingoCellClicked(row, col) {
+            // クリックできる回数のチェック
+            if (maxClicks <= 0) {
+                return; // クリックできる回数を超えた場合は処理を終了
+            }
+
+            //マスをずらす
+            row += getDiff(maxClicks, 0);
+            col += getDiff(maxClicks, 1);
+
+            // クリックされたマスを開く
+            if (0 <= row && row < 3 && 0 <= col && col < 3) {
+                boardState[row][col] = true;
+                var cell = document.querySelector('.bingo-board').children[row * 3 + col];
+                cell.classList.add('clicked');
+            } else {
+                showBingoEffect();
+            }
+
+            maxClicks--;
+
+            // 残りのクリック数の表示を更新
+            var clicksRemainingElement = document.getElementById("clicks-remaining");
+            clicksRemainingElement.textContent = "Balls: " + maxClicks;
+
+
+            // ビンゴが完成したかどうかを確認
+            var isBingo = checkBingo();
+
+            // ビンゴが完成した場合、クリアと表示
+            if (isBingo) {
+                showMessage("Bingo!\nBlack:1\nWhite:0");
+                // showBingoEffect();
+            }
+
+
+        }
+
+        // ビンゴが完成したかどうかを確認する
+        function checkBingo() {
+            // 横方向のビンゴをチェック
+            for (var row = 0; row < 3; row++) {
+                var isBingo = true;
+                for (var col = 0; col < 3; col++) {
+                    if (!boardState[row][col]) {
+                        isBingo = false;
+                        break;
+                    }
+                }
+                if (isBingo) {
+                    return true;
+                }
+            }
+
+            // 縦方向のビンゴをチェック
+            for (var col = 0; col < 3; col++) {
+                var isBingo = true;
+                for (var row = 0; row < 3; row++) {
+                    if (!boardState[row][col]) {
+                        isBingo = false;
+                        break;
+                    }
+                }
+                if (isBingo) {
+                    return true;
+                }
+            }
+
+            // 対角線方向のビンゴをチェック
+            var diagonal1 = true;
+            var diagonal2 = true;
+            for (var i = 0; i < 3; i++) {
+                if (!boardState[i][i]) {
+                    diagonal1 = false;
+                }
+                if (!boardState[i][2 - i]) {
+                    diagonal2 = false;
+                }
+            }
+            if (diagonal1 || diagonal2) {
+                return true;
+            }
+
+            return false;
+        }
+
+        // ビンゴボードの色を一時的に変更する
+        function showBingoEffect() {
+            var boardElement = document.querySelector('.bingo-board');
+
+            // 一時的に背景色を変更する
+            boardElement.style.backgroundColor = "black";
+            setTimeout(function () {
+                boardElement.style.backgroundColor = ""; // 空文字列に戻すことで元の色に戻す
+            }, 200); // x秒後に元の色に戻す（適宜調整可能）
+        }
+
+        // ゲームをリセットする
+        function resetGame() {
+            initializeBoard();
+
+            // ビンゴボードの表示をリセットする
+            var cells = document.getElementsByClassName("bingo-cell");
+            for (var i = 0; i < cells.length; i++) {
+                cells[i].classList.remove("clicked");
+            }
+
+            showMessage("");
+        }
+
+        // ページの読み込みが完了したらビンゴボードを初期化する
+        window.onload = function () {
+            initializeBoard();
+        };
+
+        // メッセージを表示する
+        function showMessage(message) {
+            var messageElement = document.getElementById("message");
+            messageElement.textContent = message;
+        }
+        // テキストカーソルを無効にする
+        var inputElement = document.querySelector('input');
+        inputElement.addEventListener('focus', function () {
+            this.blur();
+        });
+    </script>
+</body>
+
+</html>
