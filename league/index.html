@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Interactive Tournament Graph with vis.js</title>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <style type="text/css">
+        #mynetwork {
+            width: 800px;
+            height: 720px;
+            border: 1px solid lightgray;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="mynetwork"></div>
+    <form id="labelForm">
+        <label for="intro">辺をクリックすると反転できる</label><br>
+        <label for="nodeLabel">New Label:</label>
+        <input type="text" id="nodeLabel" name="nodeLabel" value="バスタオル">
+        <button type="button" onclick="updateLabel()">反映</button>
+        <button type="button" onclick="seldomReverseDummy()">ランダム強さ</button>
+        <button type="button" onclick="listHamiltonianPaths()">答え一覧</button>
+        <br>
+        <textarea id="hamiltonianPaths" rows="10" cols="50"></textarea>
+        <button type="button" onclick="saveNetworkImage()">画像を保存</button>
+        <br>
+        <label for="toggleHighlight">正解のルートをハイライト</label>
+        <input type="checkbox" id="toggleHighlight" onclick="toggleHighlightEdges()">
+
+    </form>
+    <script type="text/javascript">
+        // ノードのデータ
+        var nodes = new vis.DataSet([
+            { id: 1, label: 'り', shape: 'circle' },
+            { id: 2, label: 'ん', shape: 'circle' },
+            { id: 3, label: 'ご', shape: 'circle' }
+        ]);
+
+        // エッジのデータ
+        var edges = new vis.DataSet([
+            { from: 1, to: 2, arrows: 'to' },
+            { from: 1, to: 3, arrows: 'to' },
+            { from: 2, to: 3, arrows: 'to' },
+        ]);
+
+        // 円周上にノードを配置するための初期位置を計算
+        function updateNodePositions() {
+            var radius = 300; // 円の半径
+            var centerX = 400; // 円の中心X座標
+            var centerY = 360; // 円の中心Y座標
+            var nodeCount = nodes.length;
+            nodes.forEach(function (node, index) {
+                var angle = (2 * Math.PI / nodeCount) * index;
+                node.x = centerX + radius * Math.cos(angle);
+                node.y = centerY + radius * Math.sin(angle);
+                nodes.update(node);
+            });
+        }
+
+        // ノードの位置をランダムに設定する関数
+        function randomizeNodePositions() {
+            var radius = 300; // 円の半径
+            var centerX = 400; // 円の中心X座標
+            var centerY = 360; // 円の中心Y座標
+            var nodeCount = nodes.length;
+            var angles = Array.from({ length: nodeCount }, (_, i) => i).sort(() => Math.random() - 0.5);
+
+            nodes.forEach(function (node, index) {
+                var angle = (2 * Math.PI / nodeCount) * angles[index];
+                node.x = centerX + radius * Math.cos(angle);
+                node.y = centerY + radius * Math.sin(angle);
+                nodes.update(node);
+            });
+        }
+
+        // 初期位置の設定
+        updateNodePositions();
+
+        // オプションの設定
+        var defaultEdgeColor = '#97c2fc';
+        var options = {
+            interaction: {
+                dragNodes: true, // ノードをドラッグ可能にする
+                dragView: true,  // ビューをドラッグ可能にする
+                zoomView: true   // ズーム可能にする
+            },
+            physics: {
+                enabled: false   // 物理シミュレーションを無効にする
+            },
+            nodes: {
+                font: {
+                    size: 32,
+                    face: 'arial',
+                    background: 'none',
+                    strokeWidth: 0,
+                    strokeColor: '#ffffff',
+                    align: 'center'
+                }
+
+            },
+            edges: {
+                width: 2,
+                color: defaultEdgeColor,
+                scaling: {
+                    min: 1,
+                    max: 10,
+                    label: {
+                        enabled: true,
+                        min: 14,
+                        max: 30,
+                        maxVisible: 30,
+                        drawThreshold: 5,
+                    },
+                    customScalingFunction: function (min, max, total, value) {
+                        return value / total;
+                    },
+                },
+                smooth: {
+                    type: 'curvedCW',
+                    roundness: 0,
+                },
+                arrows:{
+                    to: { enabled: true, type: 'arrow', scaleFactor: 1.2 },
+                }
+            }
+
+        };
+
+        // ネットワークの作成
+        var container = document.getElementById('mynetwork');
+        var data = {
+            nodes: nodes,
+            edges: edges
+        };
+        var network = new vis.Network(container, data, options);
+
+
+        // エッジをクリックしたときに向きを反転するイベントリスナーを追加
+        network.on("click", function (params) {
+            if (params.edges.length > 0) {
+                var edgeId = params.edges[0];
+                var edge = edges.get(edgeId);
+                if(edge.to - edge.from === 1){
+                    alert("それ正解ルートやで");
+                }
+                edges.update({ id: edgeId, from: edge.to, to: edge.from, arrows: 'to' });
+            }
+        });
+
+
+        // ダミーの辺についてランダムで反転させる
+        function seldomReverseDummy() {
+            edges.forEach(function (edge) {
+                if (edge.to - edge.from === 1) {
+                    return;
+                } else if (edge.to - edge.from === -1) {
+                    edges.update({ id: edge.id, from: edge.to, to: edge.from, arrows: 'to' });
+                } else if (Math.random() < 0.5) {
+                    edges.update({ id: edge.id, from: edge.to, to: edge.from, arrows: 'to' });
+                }
+            })
+        }
+
+
+        // ラベルを更新する関数
+        function updateLabel() {
+            var newLabel = document.getElementById('nodeLabel').value;
+            var characters = newLabel.split('');
+
+            // 余分なノードを削除
+            // var totalNodes = nodes.length;
+            // for (var i = 0; i < totalNodes; i++) {
+            //     nodes.remove({ id: parseInt(nodeId) + i });
+            // }
+            nodes.clear();
+            edges.clear();
+
+            // 既存のノードを更新
+            characters.forEach(function (char, index) {
+                var currentNodeId = index;
+                nodes.add({ id: currentNodeId, label: char, shape: 'circle' });
+                // 既存のノードとのエッジを追加
+                nodes.forEach(function (node) {
+                    if (node.id !== currentNodeId) {
+                        edges.add({ from: node.id, to: currentNodeId, arrows: 'to' });
+                    }
+                })
+            });
+
+
+
+            // ノードの位置を更新
+            // updateNodePositions();
+            randomizeNodePositions();
+            // 色を更新
+            toggleHighlightEdges();
+        }
+
+        // ハミルトン路を列挙するDFS関数
+        function findHamiltonianPaths(graph, start, path, visited, allPaths, nodes) {
+            visited[start] = true;
+            path.push(nodes.get(start).label);
+
+            if (path.length === nodes.length) {
+                allPaths.push([...path]);
+            } else {
+                for (let neighbor of graph[start]) {
+                    if (!visited[neighbor]) {
+                        findHamiltonianPaths(graph, neighbor, path, visited, allPaths, nodes);
+                    }
+                }
+            }
+
+            path.pop();
+            visited[start] = false;
+        }
+
+        // グラフの隣接リストを作成
+        function createAdjacencyList(nodes, edges) {
+            let graph = {};
+            nodes.forEach(node => {
+                graph[node.id] = [];
+            });
+            edges.forEach(edge => {
+                graph[edge.from].push(edge.to);
+            });
+            return graph;
+        }
+
+        // ハミルトン路をフォームに書き込む関数
+        function listHamiltonianPaths() {
+            let graph = createAdjacencyList(nodes.get(), edges.get());
+            let allPaths = [];
+            let visited = {};
+            nodes.forEach(node => {
+                visited[node.id] = false;
+            });
+
+            nodes.forEach(node => {
+                findHamiltonianPaths(graph, node.id, [], visited, allPaths, nodes);
+            });
+
+            // ハミルトン路をフォームに書き込む
+            let pathsText = allPaths.map(path => path.join('')).join('\n');
+            document.getElementById('hamiltonianPaths').value = pathsText;
+        }
+
+        // ネットワークの画像を保存する関数
+        function saveNetworkImage() {
+            var canvas = document.querySelector('canvas');
+            var link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = 'network.png';
+            link.click();
+        }
+
+        // エッジの強調表示を切り替える関数
+        function toggleHighlightEdges() {
+            var isChecked = document.getElementById('toggleHighlight').checked;
+            edges.forEach(function (edge) {
+                if (Math.abs(edge.from - edge.to) === 1) {
+                    edges.update({ id: edge.id, color: isChecked ? 'red' : defaultEdgeColor, width: isChecked ? 3 : 2 });
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
