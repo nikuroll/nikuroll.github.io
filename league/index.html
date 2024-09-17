@@ -5,11 +5,17 @@
     <title>Interactive Tournament Graph with vis.js</title>
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <style type="text/css">
-        #mynetwork {
-            width: 800px;
-            height: 720px;
-            border: 1px solid lightgray;
-        }
+              body {
+        color: #d3d3d3;
+        font: 12pt arial;
+        background-color: #222222;
+      }
+      #mynetwork {
+        width: 800px;
+        height: 800px;
+        border: 1px solid #444444;
+        background-color: #222222;
+      }
     </style>
 </head>
 
@@ -33,9 +39,9 @@
     <script type="text/javascript">
         // ノードのデータ
         var nodes = new vis.DataSet([
-            { id: 1, label: 'り', shape: 'circle' },
-            { id: 2, label: 'ん', shape: 'circle' },
-            { id: 3, label: 'ご', shape: 'circle' }
+            { id: 1, label: 'り'},
+            { id: 2, label: 'ん' },
+            { id: 3, label: 'ご'}
         ]);
 
         // エッジのデータ
@@ -79,7 +85,7 @@
         updateNodePositions();
 
         // オプションの設定
-        var defaultEdgeColor = '#97c2fc';
+        var defaultEdgeColor = '#3ea5fe';
         var options = {
             interaction: {
                 dragNodes: true, // ノードをドラッグ可能にする
@@ -90,13 +96,17 @@
                 enabled: false   // 物理シミュレーションを無効にする
             },
             nodes: {
+                shape: "box",
+                color: { background: "white", border: "black" },
                 font: {
-                    size: 32,
+                    size: 64,
                     face: 'arial',
                     background: 'none',
                     strokeWidth: 0,
                     strokeColor: '#ffffff',
-                    align: 'center'
+                    align: 'center',
+                    vadjust: 4,
+                    
                 }
 
             },
@@ -180,7 +190,7 @@
             // 既存のノードを更新
             characters.forEach(function (char, index) {
                 var currentNodeId = index;
-                nodes.add({ id: currentNodeId, label: char, shape: 'circle' });
+                nodes.add({ id: currentNodeId, label: char});
                 // 既存のノードとのエッジを追加
                 nodes.forEach(function (node) {
                     if (node.id !== currentNodeId) {
