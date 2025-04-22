@@ -55,3 +55,17 @@ canvas {
 .quiz-button:hover {
     background-color: #0056b3;
 }
+
+@media (max-width: 600px) {
+    #canvas-container {
+        padding: 10px;
+    }
+
+    .quiz-container {
+        padding: 10px;
+    }
+
+    .quiz-input, .quiz-button {
+        font-size: 14px;
+    }
+}

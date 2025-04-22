@@ -24,8 +24,8 @@ function preload() {
 }
 
 function setup() {
- 
-    const canvas = createCanvas(800, 800);
+    startwidth = min(window.innerWidth, window.innerHeight, 800);
+    const canvas = createCanvas(startwidth, startwidth);
     canvas.parent('canvas');
     background(255);
     noLoop();
