@@ -1,13 +1,51 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
+    font-family: 'Roboto', Arial, sans-serif;
+    background-color: #f0f2f5;
     margin: 0;
     padding: 0;
-    /* display: flex; */
-    /* justify-content: center; */
-    /* align-items: center; */
-    height: 20vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
     flex-direction: column;
+}
+
+h1 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    margin: 10px 0;
+}
+
+a {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: #fff;
+    background-color: #007bff;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s, transform 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+a:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+a:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 #canvas-container {
@@ -25,44 +63,62 @@ canvas {
 .quiz-container {
     text-align: center;
     background: #ffffff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    width: 300px;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    width: 350px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.quiz-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
 }
 
 .quiz-input {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
     font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
     box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+
+.quiz-input:focus {
+    border-color: #007bff;
+    outline: none;
 }
 
 .quiz-button {
-    padding: 10px 20px;
+    padding: 12px 25px;
     font-size: 16px;
     color: #fff;
     background-color: #007bff;
     border: none;
-    border-radius: 5px;
+    border-radius: 10px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.2s;
 }
 
 .quiz-button:hover {
     background-color: #0056b3;
+    transform: scale(1.05);
 }
 
 @media (max-width: 600px) {
+    body {
+        padding: 20px;
+    }
+
     #canvas-container {
         padding: 10px;
     }
 
     .quiz-container {
-        padding: 10px;
+        width: 100%;
+        padding: 20px;
     }
 
     .quiz-input, .quiz-button {

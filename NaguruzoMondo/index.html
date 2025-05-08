@@ -3,47 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.8.0/p5.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/addons/p5.dom.min.js"></script>
     <link rel="stylesheet" href="style.css">
     <title>Naguruzo Mondo</title>
 </head>
 <body>
-
-    <div id="canvas" style="display: flex; justify-content: center; align-items: center; flex-direction: column;"></div>
-
-    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
-        <div id="canvas-container"></div>
-        <div class="quiz-container">
-            <input type="text" id="answerInput" class="quiz-input" placeholder="解答を入力してください">
-            <button id="submitAnswer" class="quiz-button">決定</button>
-        </div>
-    </div>
-
-
-    <script src="main.js"></script>
-    <script>
-        // Attach the canvas to the container
-        // const canvasContainer = document.getElementById('canvas-container');
-        // const sketch = (p) => {
-        //     p.setup = () => {
-        //         const canvas = p.createCanvas(800, 800);
-        //         canvas.parent(canvasContainer);
-        //     };
-        // };
-
-        // new p5(sketch);
-        document.getElementById('submitAnswer').addEventListener('click', function() {
-            const answer = document.getElementById('answerInput').value;
-            console.log('解答:', answer);
-            // alert(`あなたの解答は: ${answer}`);
-        });
-        </script>
-    
-    
-    <!-- <div id="canvas"></div> -->
-
-
+    <h1>NaguruzoMondo</h1>
+    <h1>過去問</h1>
+    <ul>
+        <li><a href="CASE1/">CASE1</a></li>
+        <li><a href="CASE2/">CASE2</a></li>
+    </ul>
 </body>
 </html>
