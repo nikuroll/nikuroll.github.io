@@ -8,14 +8,11 @@ body {
     /* align-items: center; */
     height: 20vh;
     flex-direction: column;
+    touch-action: manipulation;
 }
 
 #canvas-container {
-    /* display: flex; */
-    /* justify-content: center; */
-    /* align-items: center; */
     margin-bottom: 20px;
-    /* text-align: center; */
 }
 
 canvas {
