@@ -1,5 +1,5 @@
-let nazoid = 3;
-let imageNum = 51; // 画像の枚数
+let nazoid = 4;
+let imageNum = 37; // 画像の枚数
 let images = [];
 let showidx = [];
 let grid = 5;
@@ -10,11 +10,31 @@ let clicked = [];
 let cleared = 0;
 let revealed = 0;
 
+let actionLog = [];
+
 let tweetMess = "NaguruzoMondoに挑戦中！";
 
-let answers = ["きよみずのぶたいからとびおりる"];
+let answers = ["風"];
 
 let remainingAttempts = 3;
+
+let posCand = 
+['..zly..d.ucrorxu.d..bla..',
+'..zly..d.ualorxd.u..brc..',
+'brc..u.d..alorx..u.d..zly',
+'bla..d.u..crorx..u.d..zly',
+'brc..u.d..alolz..d.u..xry',
+'bla..d.u..crolz..d.u..xry',
+'..clb..d.uzrorau.d..ylx..',
+'..arb..u.dzrolcu.d..ylx..',
+'..clb..d.uxlorad.u..yrz..',
+'..arb..u.dxlolcd.u..yrz..',
+'yrz..u.d..xlora..u.d..clb',
+'yrz..u.d..xlolc..d.u..arb',
+'ylx..d.u..zrora..u.d..clb',
+'ylx..d.u..zrolc..d.u..arb',
+'..xry..u.dcrolzu.d..bla..',
+'..xry..u.dalolzd.u..brc..']
 
 
 
@@ -51,13 +71,61 @@ function setup() {
 }
 
 function calcNewImage(index) {
-    if (index >= 15){
-        return index + 26;
+    let order1 = ".zcxabyrdlro"
+    let order2 = ".zcxabyulrdo"
+
+    let order;
+    if ([7, 11, 13, 17].includes(index)){
+        order = order1;
+    }else{
+        order = order2;
     }
 
-    revealed++;
+    end = 0;
+    for (let i = 0; i < order.length; i++){
+        if (end == 1)break;
 
-    return revealed + 25;
+        for (let j = 0; j < posCand.length; j++){
+            if (posCand[j][index] == order[i]){
+                
+                // index文字目がorder[i]ではないものを削除
+                posCand = posCand.filter((word) => word[index] == order[i]);
+                // console.log(order[i], order);
+                end=1;
+                break;
+            }
+        }
+    }
+
+    target = posCand[0][index];
+    switch (target) {
+        case 'a':
+            return 27;
+        case 'b':
+            return 28;
+        case 'c':
+            return 29;
+        case 'd':
+            return 36;
+        case 'l':
+            return 35;
+        case 'r':
+            return 33;
+        case 'u':
+            return 34;
+        case 'x':
+            return 30;
+        case 'y':
+            return 31;
+        case 'z':
+            return 32;
+        case 'o':
+            return 26
+        default:
+            return 0;
+    }
+
+    
 }
 
 function make_tweet() {
@@ -85,10 +153,18 @@ function make_tweet() {
         tweetText += ret + "\n";
     }
 
-    
+    let palam = "?ac=";
+    for (let i = 0; i < actionLog.length; i++){
+        if (actionLog[i] == -1){
+            palam += "z";
+        }else{
+            // # x番目のアルファベット
+            palam += String.fromCharCode(actionLog[i] + 97);
+        }
+    }
     
     tweetText += `#NaguruzoMondo\n`;
-    tweetText += location.href;
+    tweetText += location.href + palam;
 
     console.log(tweetText);
     return tweetText;
@@ -152,6 +228,7 @@ function mouseReleased() {
         if (clicked[row*grid+col]==0 && col >= 0 && col < grid && row >= 0 && row < grid) {
             let index = row * grid + col;
             console.log(`マス (${col}, ${row}) がタッチされました。画像インデックス: ${index}`);
+            actionLog.push(index);
             // ここにマスがタッチされたときの動作を追加
             
             clicked[index] = true;
@@ -247,7 +324,8 @@ if (submitButton) {
             document.getElementById('remainingAttempts').textContent = `残り解答回数: ${remainingAttempts}`;
 
             alert(`ちがいます`);
+
+            actionLog.push(-1);
         }
     });
 }
-
