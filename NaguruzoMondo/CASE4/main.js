@@ -1,5 +1,5 @@
 let nazoid = 4;
-let imageNum = 37; // 画像の枚数
+let imageNum = 38; // 画像の枚数
 let images = [];
 let showidx = [];
 let grid = 5;
@@ -178,6 +178,29 @@ function tweet(tweet) {
     window.open(tweetUrl, '_blank');
 }
 
+function drawArea(){
+    // 背景と画像を再描画して影を消す
+    background(255);
+    
+    image(images[37], 0, 0, width, height);
+
+    blendMode(ADD);
+    for (let i = 0; i < grid; i++) {
+        for (let j = 0; j < grid; j++) {
+            let index = i * grid + j;
+            if (1<= showidx[index] && showidx[index] <= grid*grid){
+                blendMode(BLEND);
+            }else{
+                blendMode(MULTIPLY);
+            }
+            if (index < images.length) {
+                image(images[showidx[index]], j * cellWidth, i * cellHeight, cellWidth, cellHeight);
+            }
+        }
+    }
+    blendMode(BLEND);
+}
+
 function allOpen(){
     for (let i = 0; i < grid; i++) {
         for (let j = 0; j < grid; j++) {
@@ -188,16 +211,7 @@ function allOpen(){
             }
         }
     }
-    // 背景と画像を再描画して影を消す
-    background(255);
-    for (let i = 0; i < grid; i++) {
-        for (let j = 0; j < grid; j++) {
-            let index = i * grid + j;
-            if (index < images.length) {
-                image(images[showidx[index]], j * cellWidth, i * cellHeight, cellWidth, cellHeight);
-            }
-        }
-    }
+    drawArea();
 }
 
 function mousePressed() {
@@ -240,16 +254,7 @@ function mouseReleased() {
     }
 
 
-    // 背景と画像を再描画して影を消す
-    background(255);
-    for (let i = 0; i < grid; i++) {
-        for (let j = 0; j < grid; j++) {
-            let index = i * grid + j;
-            if (index < images.length) {
-                image(images[showidx[index]], j * cellWidth, i * cellHeight, cellWidth, cellHeight);
-            }
-        }
-    }
+    drawArea();
 }
 
 // Add event listener for the quiz answer submission
