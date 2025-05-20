@@ -14,7 +14,7 @@ let actionLog = [];
 
 let tweetMess = "NaguruzoMondoに挑戦中！";
 
-let answers = ["風"];
+let answers = ["風", "かぜ"];
 
 let remainingAttempts = 3;
 
@@ -262,7 +262,7 @@ const submitButton = document.getElementById('submitAnswer');
 if (submitButton) {
     submitButton.addEventListener('click', () => {
         const answerInput = document.getElementById('answerInput').value;
-        if (answers.length == 1 && answers.includes(answerInput)){
+        if (answers.includes(answerInput)){
             alert('正解！');
 
             tweetMess = make_tweet();
