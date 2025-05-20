@@ -20,9 +20,10 @@ let answers = ["すもっぐ","SMOG","smog"];
 let remainingAttempts = 3;
 
 let jun = [7,8,9,4,3,2,1,0,5,10,11,12,13,14,19,24,23,18,17,22,21,16,15];
+let animation = [];
+let fogLayers = [];
 
-
-
+    
 function preload() {
     for (let i = 0; i < imageNum; i++) {
         images.push(loadImage(`images/pic(${i}).PNG`));
@@ -32,6 +33,10 @@ function preload() {
         clicked.push(0);
         showidx.push(i);
     }
+
+    for (let i = 0; i < 11; i++) {
+        fogLayers.push(make_fogLayer(i));
+    }
 }
 
 function setup() {
@@ -39,7 +44,8 @@ function setup() {
     const canvas = createCanvas(startwidth, startwidth);
     canvas.parent('canvas');
     background(255);
-    noLoop();
+    // noLoop();
+    frameRate(15);
 
     cellWidth = width / grid;
     cellHeight = height / grid;
@@ -51,6 +57,22 @@ function setup() {
             if (index < images.length) {
                 image(images[showidx[index]], j * cellWidth, i * cellHeight, cellWidth, cellHeight);
             }
+        }
+    }
+
+    // アニメーションの初期化
+    for (let i = 0; i < grid*grid; i++){
+        animation.push(0);
+    }
+
+    fogLayer = createGraphics(200, 200); // 解像度を落とす
+}
+
+function draw() {
+    drawArea();
+    for (let i = 0; i < grid*grid; i++){
+        if (animation[i] > 0){
+            animation[i]--;
         }
     }
 }
@@ -125,6 +147,48 @@ function tweet(tweet) {
     window.open(tweetUrl, '_blank');
 }
 
+function draw_noise(idx, level){
+    // Set the noise level and scale.
+    let noiseLevel = 255;
+    let noiseScale = 0.01;
+
+    sx = idx % grid;
+    sy = floor(idx / grid);
+
+    image(fogLayers[level], sx * cellWidth, sy * cellHeight, cellWidth, cellHeight);
+
+    
+}
+
+function make_fogLayer(level){
+    let fogLayer = createGraphics(200, 200); // 解像度を落とす
+    fogLayer.background(255, 0, 0);
+
+    let noiseScale = 0.7;
+    let noiseLevel = 510 * level / 10;
+    let size = 200;
+
+    for (let y = 0; y < 200; y += 1) {
+        for (let x = 0; x < 200; x += 1) {
+            // 円環ノイズ座標変換
+            let theta_x = (x / size) * TWO_PI;
+            let theta_y = (y / size) * TWO_PI;
+            let nx = cos(theta_x) * noiseScale + 1;
+            let ny = sin(theta_x) * noiseScale + 1;
+            let nz = cos(theta_y) * noiseScale + 1;
+            let nw = sin(theta_y) * noiseScale + 1;
+            // 4次元ノイズでタイル化
+            let c = noiseLevel * noise(nx, ny, nz, nw);
+
+            // ここでノイズ値を使って色を決める
+            fogLayer.set(x, y, color(0, 0, 0, c));
+        }
+    }
+    fogLayer.updatePixels(); // ←これが必要！
+
+    return fogLayer;
+}
+
 function drawArea(){
     // 背景と画像を再描画して影を消す
     background(255);
@@ -135,6 +199,11 @@ function drawArea(){
     for (let i = 0; i < grid; i++) {
         for (let j = 0; j < grid; j++) {
             let index = i * grid + j;
+
+            blendMode(BLEND);
+            draw_noise(index, animation[index]);
+            // continue;
+
             if (1<= showidx[index] && showidx[index] <= grid*grid){
                 blendMode(BLEND);
             }else{
@@ -155,6 +224,7 @@ function allOpen(){
                 clicked[i*grid+j] = 1;
                 let index = i * grid + j;
                 showidx[index] = calcNewImage(index);
+                animation[index] = 10;
             }
         }
     }
@@ -197,6 +267,7 @@ function mouseReleased() {
             newpic = calcNewImage(index);
             console.log(newpic);
             showidx[index] = newpic; // 画像を変更
+            animation[index] = 10;
         }
     }
 
