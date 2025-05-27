@@ -23,6 +23,8 @@ let jun = [7,8,9,4,3,2,1,0,5,10,11,12,13,14,19,24,23,18,17,22,21,16,15];
 let animation = [];
 let fogLayers = [];
 
+let pressedCell = null; // 追加
+
     
 function preload() {
     for (let i = 0; i < imageNum; i++) {
@@ -215,6 +217,14 @@ function drawArea(){
         }
     }
     blendMode(BLEND);
+
+    // ここでタッチ中のマスに影を描画
+    if (pressedCell !== null) {
+        let {col, row} = pressedCell;
+        fill(0, 0, 0, 100); // 半透明の黒
+        noStroke();
+        rect(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
+    }
 }
 
 function allOpen(){
@@ -232,25 +242,25 @@ function allOpen(){
 }
 
 function mousePressed() {
-    // タッチ開始位置を記録
     startX = mouseX;
     startY = mouseY;
 
-    // タッチ中のマスを影で強調
     let col = floor(mouseX / cellWidth);
     let row = floor(mouseY / cellHeight);
     if(clicked[row * grid + col] === true){
+        pressedCell = null;
         return;
     }
 
     if (col >= 0 && col < grid && row >= 0 && row < grid) {
-        fill(0, 0, 0, 100); // 半透明の黒
-        noStroke();
-        rect(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
+        pressedCell = {col, row}; // ここで記録
     }
 }
 
 function mouseReleased() {
+    // タッチ終了時に影を消す
+    pressedCell = null;
+
     // タッチ終了位置が開始位置とほぼ同じ場合のみ動作
     if (cleared == 0 && floor(startX / cellWidth) === floor(mouseX / cellWidth) && floor(startY / cellHeight) === floor(mouseY / cellHeight)) {
         let col = floor(mouseX / cellWidth);
@@ -270,7 +280,6 @@ function mouseReleased() {
             animation[index] = 10;
         }
     }
-
 
     drawArea();
 }
