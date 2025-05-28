@@ -118,7 +118,7 @@ function makeMineBoard(startidx) {
             res = getMineCount(i);
             if (res >= 4) {
                 end = 0;
-            } else {
+            } else if(mines[i] == 0){
                 check[res]++;
             }
         }
