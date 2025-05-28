@@ -27,7 +27,7 @@ function preload() {
         images.push(loadImage(`images/pic(${i}).PNG`));
     }
 
-    for (let i = 1; i <= grid*grid; i++) {
+    for (let i = 1; i <= grid * grid; i++) {
         clicked.push(0);
         showidx.push(i);
     }
@@ -95,7 +95,7 @@ function makeMineBoard(startidx) {
 
     end = 0;
     cnt = 0;
-    while (end == 0){
+    while (end == 0) {
         // ランダムにマスを選んで地雷を5個配置
         for (let i = 0; i < grid * grid; i++) {
             mines[i] = 0;
@@ -105,26 +105,26 @@ function makeMineBoard(startidx) {
         while (cnt < 5) {
 
             let mineIndex = floor(random(grid * grid));
-            if (!isNeibour(mineIndex,startidx) && mines[mineIndex] == 0) {
+            if (!isNeibour(mineIndex, startidx) && mines[mineIndex] == 0) {
                 mines[mineIndex] = 1;
                 cnt++;
             }
         }
 
 
-        check = [1,0,0,0];
+        check = [1, 0, 0, 0];
         end = 1;
         for (let i = 0; i < grid * grid; i++) {
             res = getMineCount(i);
-            if (res >= 4){
+            if (res >= 4) {
                 end = 0;
-            }else{
+            } else {
                 check[res]++;
             }
         }
 
         for (let i = 0; i < 4; i++) {
-            if (check[i] == 0){
+            if (check[i] == 0) {
                 end = 0;
             }
         }
@@ -141,9 +141,9 @@ function calcNewImage(index) {
 
     if (mines[index] == 1) {
         // 地雷がある場合は地雷の画像を返す
-        if (cleared == 0){
-           return 32; // 地雷の画像インデックス
-        }else{
+        if (cleared == 0) {
+            return 32; // 地雷の画像インデックス
+        } else {
             return 31; // 地雷の画像インデックス（クリア後）
         }
     }
@@ -153,28 +153,28 @@ function calcNewImage(index) {
     return mineCount + 27;
 }
 
-function make_tweet(res=0) {
-    score = grid*grid;
-    for (let i = 0; i < grid*grid; i++){
-        if (clicked[i] == 1){
+function make_tweet(res = 0) {
+    score = grid * grid;
+    for (let i = 0; i < grid * grid; i++) {
+        if (clicked[i] == 1) {
             score--;
         }
     }
 
     attempt = 3 - remainingAttempts + 1;
 
-    if (res == 0){
-        tweetText = `CASE${nazoid}\n\nScore: ${score}/${grid*grid} (${attempt}回目)\n`;
-    } else{
+    if (res == 0) {
+        tweetText = `CASE${nazoid}\n\nScore: ${score}/${grid * grid} (${attempt}回目)\n`;
+    } else {
         tweetText = `CASE${nazoid}\n\nScore: 失格\n`;
     }
     for (let i = 0; i < grid; i++) {
         ret = "";
         for (let j = 0; j < grid; j++) {
             let index = i * grid + j;
-            if (clicked[index] == 1){
+            if (clicked[index] == 1) {
                 ret += "⬜";
-            }else{
+            } else {
                 ret += "🟨";
             }
         }
@@ -183,15 +183,15 @@ function make_tweet(res=0) {
     }
 
     let palam = "?ac=";
-    for (let i = 0; i < actionLog.length; i++){
-        if (actionLog[i] == -1){
+    for (let i = 0; i < actionLog.length; i++) {
+        if (actionLog[i] == -1) {
             palam += "z";
-        }else{
+        } else {
             // # x番目のアルファベット
             palam += String.fromCharCode(actionLog[i] + 97);
         }
     }
-    
+
     tweetText += `#NaguruzoMondo\n`;
     tweetText += location.href + palam;
 
@@ -207,19 +207,19 @@ function tweet(tweet) {
     window.open(tweetUrl, '_blank');
 }
 
-function drawArea(){
+function drawArea() {
     // 背景と画像を再描画して影を消す
     background(255);
-    
+
     image(images[26], 0, 0, width, height);
 
     blendMode(ADD);
     for (let i = 0; i < grid; i++) {
         for (let j = 0; j < grid; j++) {
             let index = i * grid + j;
-            if (1<= showidx[index] && showidx[index] <= grid*grid){
+            if (1 <= showidx[index] && showidx[index] <= grid * grid) {
                 blendMode(BLEND);
-            }else{
+            } else {
                 blendMode(MULTIPLY);
             }
             if (index < images.length) {
@@ -230,11 +230,11 @@ function drawArea(){
     blendMode(BLEND);
 }
 
-function allOpen(){
+function allOpen() {
     for (let i = 0; i < grid; i++) {
         for (let j = 0; j < grid; j++) {
-            if (clicked[i*grid+j] == 0){
-                clicked[i*grid+j] = 1;
+            if (clicked[i * grid + j] == 0) {
+                clicked[i * grid + j] = 1;
                 let index = i * grid + j;
                 showidx[index] = calcNewImage(index);
             }
@@ -244,6 +244,9 @@ function allOpen(){
 }
 
 function mousePressed() {
+    if (mouseButton === RIGHT) {
+        return false; // 右クリックを無効化
+    }
     // タッチ開始位置を記録
     startX = mouseX;
     startY = mouseY;
@@ -251,7 +254,7 @@ function mousePressed() {
     // タッチ中のマスを影で強調
     let col = floor(mouseX / cellWidth);
     let row = floor(mouseY / cellHeight);
-    if(clicked[row * grid + col] === true){
+    if (clicked[row * grid + col] === true) {
         return;
     }
 
@@ -263,11 +266,14 @@ function mousePressed() {
 }
 
 function mouseReleased() {
+    if (mouseButton === RIGHT) {
+        return false; // 右クリックを無効化
+    }
     if (cleared == 0 && floor(startX / cellWidth) === floor(mouseX / cellWidth) && floor(startY / cellHeight) === floor(mouseY / cellHeight)) {
         let col = floor(mouseX / cellWidth);
         let row = floor(mouseY / cellHeight);
-        
-        if (clicked[row*grid+col]==0 && col >= 0 && col < grid && row >= 0 && row < grid) {
+
+        if (clicked[row * grid + col] == 0 && col >= 0 && col < grid && row >= 0 && row < grid) {
             let index = row * grid + col;
             actionLog.push(index);
             clicked[index] = true;
@@ -279,7 +285,7 @@ function mouseReleased() {
                 cleared = 1;
                 tweetMess = make_tweet(1);
                 drawArea(); // 画像を先に更新
-                showResultButtons(tweetMess); 
+                showResultButtons(tweetMess);
                 setTimeout(() => {
                     alert('地雷を踏みました！');
                 }, 100); // 100ミリ秒遅延
@@ -294,7 +300,7 @@ const submitButton = document.getElementById('submitAnswer');
 if (submitButton) {
     submitButton.addEventListener('click', () => {
         const answerInput = document.getElementById('answerInput').value;
-        if (answers.includes(answerInput)){
+        if (answers.includes(answerInput)) {
             alert('正解！');
 
             tweetMess = make_tweet();
@@ -302,11 +308,11 @@ if (submitButton) {
             cleared = 1;
 
             showResultButtons(tweetMess);
-        }else{
-            if (answers.includes(answerInput)){
+        } else {
+            if (answers.includes(answerInput)) {
                 answers = answers.filter(e => e !== answerInput);
             }
-            
+
             remainingAttempts--;
             document.getElementById('remainingAttempts').textContent = `残り解答回数: ${remainingAttempts}`;
 
