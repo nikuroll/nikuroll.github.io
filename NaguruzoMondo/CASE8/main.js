@@ -34,7 +34,6 @@ function preload() {
         clicked.push(0);
         showidx.push(i);
     }
-
 }
 
 function setup() {

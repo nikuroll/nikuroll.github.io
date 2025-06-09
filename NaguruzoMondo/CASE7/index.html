@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.8.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/addons/p5.dom.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <title>Naguruzo Mondo</title>
+</head>
+<body>
+
+    <div id="canvas" style="display: flex; justify-content: center; align-items: center; flex-direction: column;"></div>
+
+    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+        <div id="canvas-container"></div>
+        <div class="quiz-container">
+            <div id="remainingAttempts" class="quiz-info">残り解答回数: 3</div>
+            <input type="text" id="answerInput" class="quiz-input" placeholder="解答を入力">
+            <button id="submitAnswer" class="quiz-button">決定</button>
+        </div>
+    </div>
+
+
+    <script src="main.js"></script>
+</body>
+</html>
