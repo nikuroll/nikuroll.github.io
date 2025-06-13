@@ -164,7 +164,7 @@ function make_tweet() {
     }
     
     tweetText += `#NaguruzoMondo\n`;
-    tweetText += location.href + palam;
+    tweetText += location.origin + location.pathname + palam;
 
     console.log(tweetText);
     return tweetText;
