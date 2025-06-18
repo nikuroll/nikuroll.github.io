@@ -48,12 +48,45 @@ a:active {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.back-to-top-footer {
+    text-align: center;
+    margin: 48px 0 16px 0;
+}
+
+.back-to-top-link {
+    display: inline-block;
+    padding: 7px 20px;
+    background: linear-gradient(90deg, #ffb347 0%, #ffcc33 100%);
+    color: #333;
+    border-radius: 18px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1em;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.back-to-top-link:hover {
+    background: linear-gradient(90deg, #ffe082 0%, #ffd54f 100%);
+    color: #222;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+}
+
+#canvas {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-direction: column;
+    /* 余計な座標指定や高さ指定はしない */
+    position: relative;
+    z-index: 1;
+}
+
 #canvas-container {
-    /* display: flex; */
-    /* justify-content: center; */
-    /* align-items: center; */
     margin-bottom: 20px;
-    /* text-align: center; */
+    /* 余計な座標指定や高さ指定はしない */
+    position: relative;
+    z-index: 10;
 }
 
 canvas {
@@ -67,12 +100,21 @@ canvas {
     border-radius: 15px;
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
     width: 350px;
-    transition: transform 0.3s, box-shadow 0.3s;
+    /* ホバー時の変化を無効化 */
+    transition: none;
+    position: relative;
+    z-index: 10;
 }
 
+/* ホバー時の変化を無効化 */
 .quiz-container:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
+    transform: none;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.quiz-input, .quiz-button {
+    all: unset;
+    /* 既存の個別スタイルはこの下に再定義 */
 }
 
 .quiz-input {
@@ -103,6 +145,22 @@ canvas {
 }
 
 .quiz-button:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+button {
+    padding: 12px 25px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+button:hover {
     background-color: #0056b3;
     transform: scale(1.05);
 }
