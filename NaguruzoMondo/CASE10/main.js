@@ -1,5 +1,6 @@
-let nazoid = 6;
-let imageNum = 33; // 画像の枚数
+let nazoid = 10;
+let imageNum = 43; // 画像の枚数
+let backgroundIndex = 42; // 背景画像のインデックス
 let images = [];
 let showidx = [];
 let grid = 5;
@@ -14,11 +15,14 @@ let actionLog = [];
 
 let tweetMess = "NaguruzoMondoに挑戦中！";
 
-let answers = ["bee", "Bee", "BEE"];
+let answers = ["でふらぐ", "デフラグ"];
 
 let remainingAttempts = 3;
 
-let mines = [];
+let revealedQuestions = 0;
+let questionPos = [-1, -1, -1, -1];
+let questionImages = [[30,27,34,35], [27,31,36,37], [28,32,38,39], [33,28,40,41]];
+let questionPhase = [-1, -1, -1, -1];
 
 
 
@@ -54,103 +58,41 @@ function setup() {
     }
 }
 
-function isNeibour(idx1, idx2) {
-    let row1 = floor(idx1 / grid);
-    let col1 = idx1 % grid;
-    let row2 = floor(idx2 / grid);
-    let col2 = idx2 % grid;
-
-    // 8方向の隣接チェック
-    return (abs(row1 - row2) <= 1 && abs(col1 - col2) <= 1);
-}
-
-function getMineCount(index) {
-    let count = 0;
-    let row = floor(index / grid);
-    let col = index % grid;
-
-    // 8方向の隣接セルをチェック
-    for (let i = -1; i <= 1; i++) {
-        for (let j = -1; j <= 1; j++) {
-            if (i === 0 && j === 0) continue; // 自分自身は除外
-            let newRow = row + i;
-            let newCol = col + j;
-            if (newRow >= 0 && newRow < grid && newCol >= 0 && newCol < grid) {
-                let neighborIndex = newRow * grid + newCol;
-                if (mines[neighborIndex] === 1) {
-                    count++;
-                }
-            }
-        }
-    }
-    return count;
-}
-
-
-function makeMineBoard(startidx) {
-    mines = [];
-    for (let i = 0; i < grid * grid; i++) {
-        mines.push(0);
-    }
-
-    end = 0;
-    cnt = 0;
-    while (end == 0) {
-        // ランダムにマスを選んで地雷を5個配置
-        for (let i = 0; i < grid * grid; i++) {
-            mines[i] = 0;
-        }
-        cnt = 0;
-
-        while (cnt < 5) {
-
-            let mineIndex = floor(random(grid * grid));
-            if (!isNeibour(mineIndex, startidx) && mines[mineIndex] == 0) {
-                mines[mineIndex] = 1;
-                cnt++;
-            }
-        }
-
-
-        check = [1, 0, 0, 0];
-        end = 1;
-        for (let i = 0; i < grid * grid; i++) {
-            res = getMineCount(i);
-            if (res >= 4) {
-                end = 0;
-            } else if(mines[i] == 0){
-                check[res]++;
-            }
-        }
-
-        for (let i = 0; i < 4; i++) {
-            if (check[i] == 0) {
-                end = 0;
-            }
-        }
-
-    }
-    return mines;
-}
-
-
 function calcNewImage(index) {
-    if (mines.length == 0) {
-        makeMineBoard(index);
+    if (index >= 20){
+        return 0;
     }
 
-    if (mines[index] == 1) {
-        // 地雷がある場合は地雷の画像を返す
-        if (cleared == 0) {
-            return 32; // 地雷の画像インデックス
-        } else {
-            return 31; // 地雷の画像インデックス（クリア後）
+    if (index%5 == 2){
+        return 29;
+    }
+
+    line = Math.floor(index / 5);
+    if (questionPos[line] == -1) {
+        // 質問がまだ出ていない行
+        questionPos[line] = revealedQuestions;
+        if (index%5 < 2){
+            questionPhase[line] = 0;
+        }else{
+            questionPhase[line] = 1;
         }
+        revealedQuestions++;
     }
 
-    // 地雷がない場合は周囲の地雷の数に応じた画像を返す
-    let mineCount = getMineCount(index);
-    return mineCount + 27;
+    nowQ = questionPos[line];
+    nowP = index % 5;
+    if (nowP > 2){
+        nowP -= 1;
+    }
+    if (questionPhase[line] == 0) {
+        nowP = (nowP + 2)%4
+    }
+
+    res = questionImages[nowQ][nowP];
+    if (cleared && res == 27){
+        res = 26;
+    }
+    return res;
 }
 
 function make_tweet(res = 0) {
@@ -211,7 +153,7 @@ function drawArea() {
     // 背景と画像を再描画して影を消す
     background(255);
 
-    image(images[26], 0, 0, width, height);
+    image(images[backgroundIndex], 0, 0, width, height);
 
     blendMode(ADD);
     for (let i = 0; i < grid; i++) {
@@ -281,7 +223,7 @@ function mouseReleased() {
             showidx[index] = newpic;
 
             // 地雷を踏んだ場合
-            if (newpic === 32) {
+            if (newpic === 27) {
                 cleared = 1;
                 tweetMess = make_tweet(1);
                 drawArea(); // 画像を先に更新
