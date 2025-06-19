@@ -1,5 +1,5 @@
 let nazoid = 10;
-let imageNum = 43; // 画像の枚数
+let imageNum = 45; // 画像の枚数
 let backgroundIndex = 42; // 背景画像のインデックス
 let images = [];
 let showidx = [];
@@ -15,13 +15,13 @@ let actionLog = [];
 
 let tweetMess = "NaguruzoMondoに挑戦中！";
 
-let answers = ["でふらぐ", "デフラグ"];
+let answers = ["まいんど", "マインド"];
 
 let remainingAttempts = 3;
 
 let revealedQuestions = 0;
 let questionPos = [-1, -1, -1, -1];
-let questionImages = [[30,27,34,35], [27,31,36,37], [28,32,38,39], [33,28,40,41]];
+let questionImages = [[30,27,34,35], [33,28,43,44], [28,32,38,39], [27,31,40,41]];
 let questionPhase = [-1, -1, -1, -1];
 
 
