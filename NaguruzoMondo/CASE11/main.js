@@ -26,6 +26,7 @@ let forceDecrementMode = false;
 let forceDecrementFrame = 0;
 
 let lastClickFrame = -10; // 直近でクリックを受理したフレーム番号
+let ichigekipos = [0,1,4,5,6,8,9,10,11,13,14,15,16,17,18,19,21,23];
     
 function preload() {
     for (let i = 0; i < imageNum; i++) {
@@ -78,10 +79,12 @@ function draw() {
 }
 
 function calcNewImage(index) {
-    // パネル4（index==3）のときだけ0.1減少、それ以外は1減少
+    // ichigekiposに含まれる場合は一発で0、それ以外は従来通り
     let current = showidx[index];
     let next;
-    if (index === 3) {
+    if (ichigekipos.includes(index)) {
+        next = 0;
+    } else if (index === 3) {
         next = current - 0.1;
     } else {
         next = current - 1;
@@ -96,7 +99,9 @@ function make_tweet(res = 0) {
     // スコアは25から全パネルの耐久値の合計減少分
     let totalDurability = 0;
     for (let i = 0; i < grid * grid; i++) {
-        if (i != 3) {
+        if (ichigekipos.includes(i)) {
+            if(showidx[i] < 1e-6) {totalDurability += 1; }
+        } else if (i != 3) {
             totalDurability += i + 1 - showidx[i];
         } else {
             totalDurability += (i + 1 - showidx[i]) * 10; // パネル4は10倍
@@ -123,7 +128,6 @@ function make_tweet(res = 0) {
         }
         tweetText += ret + "\n";
     }
-
     let palam = "?ac=";
     for (let i = 0; i < actionLog.length; i++) {
         if (actionLog[i] == -1) {
@@ -132,9 +136,9 @@ function make_tweet(res = 0) {
             palam += String.fromCharCode(actionLog[i] + 97);
         }
     }
+    palam = ""; // 今回はパラメータなしでいい
     tweetText += `#NaguruzoMondo\n`;
     tweetText += location.origin + location.pathname + palam;
-
     console.log(tweetText);
     return tweetText;
 }
