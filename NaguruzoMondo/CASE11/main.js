@@ -85,7 +85,11 @@ function calcNewImage(index) {
     if (ichigekipos.includes(index)) {
         next = 0;
     } else if (index === 3) {
-        next = current - 0.1;
+        if (current > 0.1) {
+            next = current - 0.1;
+        } else {
+            next = current - 0.01;
+        }
     } else {
         next = current - 1;
     }
@@ -104,7 +108,13 @@ function make_tweet(res = 0) {
         } else if (i != 3) {
             totalDurability += i + 1 - showidx[i];
         } else {
-            totalDurability += (i + 1 - showidx[i]) * 10; // パネル4は10倍
+            clickcount = 0;
+            if (showidx[i] < 0.1 + 1e-6){
+                clickcount = 30 + (0.1 - showidx[i]) * 100; 
+            }else{
+                clickcount = (4.0 - showidx[i]) * 10; // パネル4は10倍
+            }
+            totalDurability += clickcount;
         }
         
     }
