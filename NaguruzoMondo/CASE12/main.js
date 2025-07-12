@@ -1,6 +1,6 @@
 let nazoid = 12;
-let imageNum = 28; // 画像の枚数
-let backgroundImage = 0; // 背景画像のインデックス
+let imageNum = 53; // 画像の枚数
+let backgroundImage = 27; // 背景画像のインデックス
 
 
 // パネルクラスの定義
@@ -46,7 +46,7 @@ class Panel {
         this.isAnimating = true;
         // 移動距離に応じて速度を調整
         const distance = newTargetY - this.y;
-        this.fallSpeed = distance / animationFrames; // 固定フレーム数で移動するための速度
+        this.fallSpeed = distance / animationFrames + 0.5; // 固定フレーム数で移動するための速度
     }
 }
 let images = [];
@@ -66,9 +66,15 @@ let actionLog = [];
 let tweetMess = "NaguruzoMondoに挑戦中！";
 
 let coin = 0;
-let answers = ["からしめんたいこ","辛子明太子"];
+let answers = ["とら","おおかみ"];
+let true_answers = ["ぜんもんのとらこうもんのおおかみ"];
 function answerCheck(word){
-    return answers.includes(word);
+    if(true_answers.includes(word)){
+        return 1; // 完全に正解
+    }else if(answers.includes(word)){
+        return 0; // 部分的に正解
+    }
+    return -1; // 不正解
 }
 
 let remainingAttempts = 3;
@@ -91,9 +97,9 @@ function preload() {
     for (let i = 0; i < totalRows * grid; i++) {
         clicked.push(0);
         if (i < grid * grid) {
-            showidx.push(i + 1); // 画面内のパネルは通常の画像
+            showidx.push(i + 28); // 画面外のパネル
         } else {
-            showidx.push((i % (grid * grid)) + 1); // 画面外のパネルもランダムな画像
+            showidx.push((i % (grid * grid)) + 1); // 画面内のパネル
         }
     }
 }
@@ -137,6 +143,7 @@ function draw() {
     isAnimating = panels.some(p => p.isAnimating);
     
     drawArea();
+
 }
 
 // パネル重力落下処理
@@ -144,7 +151,7 @@ function applyGravity(clickedPanelIndex) {
     const clickedCol = clickedPanelIndex % grid;
     const clickedRow = Math.floor(clickedPanelIndex / grid);
     
-    const fixedAnimationFrames = 15; // 固定アニメーション時間（フレーム数）
+    const fixedAnimationFrames = 60; // 固定アニメーション時間（フレーム数）
     
     // クリックされたパネルより上の列のパネルを下に移動（アニメーション開始）
     for (let row = clickedRow - 1; row >= 0; row--) {
@@ -153,7 +160,7 @@ function applyGravity(clickedPanelIndex) {
         
         if (currentIndex >= 0 && targetIndex < panels.length) {
             // アニメーション用の目標位置を設定
-            const targetY = Math.floor(targetIndex / grid - (totalRows - grid)) * cellHeight;
+            const targetY = (Math.floor(targetIndex / grid) - (totalRows - grid)) * cellHeight;
             panels[currentIndex].startFalling(targetY, fixedAnimationFrames);
         }
     }
@@ -189,35 +196,17 @@ function applyGravity(clickedPanelIndex) {
 }
 
 function calcNewImage(index) {
-    if (inner.includes(index)){
-        return 0;
-    }
-    
-    if (cand.length == 1){
-        if (index == cand[0]) {
-            return 26;
-        }else if (index == 24 - cand[0]) {
-            return 27;
-        }
-    }
-
-    if (cand.includes(index)){
-        cand.splice(cand.indexOf(index), 1);
-    }
-    if (cand.includes(24-index)) {
-        cand.splice(cand.indexOf(24 - index), 1);
-    }
-
-    console.log(inner, cand);
-
     return 0;
 }
 
 function make_tweet(res = 0) {
     score = grid * grid;
-    for (let i = 0; i < grid * grid; i++) {
-        if (clicked[i] == 1) {
-            score--;
+
+    towers = [10,10,10,10,10];
+    for (let i = 0; i < actionLog.length; i++) {
+        if (actionLog[i] > -1) {
+            score -= 1;
+            towers[actionLog[i]]--;
         }
     }
 
@@ -226,13 +215,13 @@ function make_tweet(res = 0) {
     if (res == 0) {
         tweetText = `CASE${nazoid}\n\nScore: ${score}/${grid * grid} (${attempt}回目)\n`;
     } else {
-        tweetText = `CASE${nazoid}\n\nScore: 失格\n`;
+        tweetText = `CASE${nazoid}\n\nScore: ${10000+score}/${grid * grid} (${attempt}回目)\n`
     }
     for (let i = 0; i < grid; i++) {
         ret = "";
         for (let j = 0; j < grid; j++) {
             let index = i * grid + j;
-            if (clicked[index] == 1) {
+            if (towers[j] + i < 5) {
                 ret += "⬜";
             } else {
                 ret += "🟨";
@@ -270,15 +259,15 @@ function tweet(tweet) {
 function drawArea() {
     // 背景と画像を再描画して影を消す
     background(255);
-    // image(images[backgroundImage], 0, 0, width, height);
-    drawTetrahedronNatural(width / 2, height / 2, width / 2, frameCount / 200);
+    image(images[backgroundImage], 0, 0, width, height);
+
 
     // 通常パネル（BLEND）
     blendMode(BLEND);
     for (let idx = 0; idx < panels.length; idx++) {
         let p = panels[idx];
         let showid = showidx[idx];
-        if (1 <= showid && showid <= grid * grid) {
+        if (showid >= 1) {
             p.id = showid;
             p.draw(images);
         }
@@ -288,7 +277,7 @@ function drawArea() {
     for (let idx = 0; idx < panels.length; idx++) {
         let p = panels[idx];
         let showid = showidx[idx];
-        if (!(1 <= showid && showid <= grid * grid)) {
+        if (!(showid >= 1)) {
             p.id = showid;
             p.draw(images);
         }
@@ -362,7 +351,7 @@ function mouseReleased() {
     
     // 同じパネル上で開始・終了し、まだクリックされていない場合
     if (cleared == 0 && startPanel >= 0 && startPanel === endPanel && clicked[startPanel] == 0) {
-        actionLog.push(startPanel);
+        actionLog.push(startPanel%5);
         clicked[startPanel] = true;
         let newpic = calcNewImage(startPanel);
         showidx[startPanel] = newpic;
@@ -380,10 +369,18 @@ const submitButton = document.getElementById('submitAnswer');
 if (submitButton) {
     submitButton.addEventListener('click', () => {
         const answerInput = document.getElementById('answerInput').value;
-        if (answerCheck(answerInput)) {
+        if (answerCheck(answerInput) == 0) {
             alert('正解！');
 
-            tweetMess = make_tweet();
+            tweetMess = make_tweet(0);
+
+            cleared = 1;
+
+            showResultButtons(tweetMess);
+        }else if (answerCheck(answerInput) == 1) {
+            alert('完全に正解！');
+
+            tweetMess = make_tweet(res=1);
 
             cleared = 1;
 
@@ -455,116 +452,4 @@ function showResultButtons(tweetMess) {
 
     const container = document.getElementById('canvas-container');
     container.appendChild(buttonContainer);
-}
-
-// 3Dノイズでランダムな回転を与えた正四面体を描画
-function drawTetrahedron(cx, cy, size, phase = 0) {
-    // 正四面体の4頂点（正規化済み）
-    const rawVerts = [
-        [1, 1, 1],
-        [1, -1, -1],
-        [-1, 1, -1],
-        [-1, -1, 1]
-    ].map(v => {
-        let n = Math.sqrt(v[0]**2 + v[1]**2 + v[2]**2);
-        return v.map(x => x / n);
-    });
-    // 3Dノイズで回転軸と角度を決める
-    let theta = noise(phase, 0) * Math.PI * 2;
-    let phi = noise(0, phase) * Math.PI;
-    let axis = [
-        Math.sin(phi) * Math.cos(theta),
-        Math.sin(phi) * Math.sin(theta),
-        Math.cos(phi)
-    ];
-    let angle = noise(phase, phase) * Math.PI * 2;
-    // ロドリゲスの回転公式
-    function rotate(v, axis, angle) {
-        const [x, y, z] = v;
-        const [u, v1, w] = axis;
-        const cosA = Math.cos(angle);
-        const sinA = Math.sin(angle);
-        return [
-            (u*u+(1-u*u)*cosA)*x + (u*v1*(1-cosA)-w*sinA)*y + (u*w*(1-cosA)+v1*sinA)*z,
-            (u*v1*(1-cosA)+w*sinA)*x + (v1*v1+(1-v1*v1)*cosA)*y + (v1*w*(1-cosA)-u*sinA)*z,
-            (u*w*(1-cosA)-v1*sinA)*x + (v1*w*(1-cosA)+u*sinA)*y + (w*w+(1-w*w)*cosA)*z
-        ];
-    }
-    // 回転適用
-    let verts = rawVerts.map(v => rotate(v, axis, angle));
-    // 2D投影（パース付き）
-    let projected = verts.map(([x, y, z]) => {
-        const d = 3.5; // 視点距離
-        const perspective = d / (d - z);
-        return [cx + x * size * perspective, cy + y * size * perspective];
-    });
-    // 頂点描画
-    fill(100, 180, 255);
-    stroke(0);
-    strokeWeight(2);
-    for(const [x, y] of projected){
-        ellipse(x, y, 14, 14);
-    }
-    // 辺を描画
-    const edges = [[0,1],[0,2],[0,3],[1,2],[2,3],[3,1]];
-    for(const [i,j] of edges){
-        const [x1,y1]=projected[i];
-        const [x2,y2]=projected[j];
-        line(x1,y1,x2,y2);
-    }
-}
-
-// 3軸独立の連続回転で自然な3D回転を与える正四面体描画
-function drawTetrahedronNatural(cx, cy, size, phase = 0) {
-    // 正四面体の4頂点（正規化済み）
-    const rawVerts = [
-        [1, 1, 1],
-        [1, -1, -1],
-        [-1, 1, -1],
-        [-1, -1, 1]
-    ].map(v => {
-        let n = Math.sqrt(v[0]**2 + v[1]**2 + v[2]**2);
-        return v.map(x => x / n);
-    });
-    // 3軸独立の連続回転
-    function rotate3D([x, y, z], t) {
-        // X軸
-        let rx = t * 0.7;
-        let y1 = y * Math.cos(rx) - z * Math.sin(rx);
-        let z1 = y * Math.sin(rx) + z * Math.cos(rx);
-        let x1 = x;
-        // Y軸
-        let ry = t * 1.1;
-        let z2 = z1 * Math.cos(ry) - x1 * Math.sin(ry);
-        let x2 = z1 * Math.sin(ry) + x1 * Math.cos(ry);
-        let y2 = y1;
-        // Z軸
-        let rz = t * 1.5;
-        let x3 = x2 * Math.cos(rz) - y2 * Math.sin(rz);
-        let y3 = x2 * Math.sin(rz) + y2 * Math.cos(rz);
-        let z3 = z2;
-        return [x3, y3, z3];
-    }
-    // 回転適用
-    let verts = rawVerts.map(v => rotate3D(v, phase));
-    // 2D投影（パース付き）
-    let projected = verts.map(([x, y, z]) => {
-        const d = 100; // 視点距離
-        const perspective = d / (d - z);
-        return [cx + x * size * perspective, cy + y * size * perspective];
-    });
-    // 頂点描画
-    fill(100, 180, 255);
-    stroke(0);
-    strokeWeight(2);
-    // for(const [x, y] of projected){
-    //     ellipse(x, y, 14, 14);
-    // }
-    // 辺を描画
-    const edges = [[0,1],[0,2],[0,3],[1,2],[2,3],[3,1]];
-    for(const [i,j] of edges){
-        const [x1,y1]=projected[i];
-        const [x2,y2]=projected[j];
-        line(x1,y1,x2,y2);
-    }
 }
