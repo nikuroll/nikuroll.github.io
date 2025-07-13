@@ -46,7 +46,7 @@ class Panel {
         this.isAnimating = true;
         // 移動距離に応じて速度を調整
         const distance = newTargetY - this.y;
-        this.fallSpeed = distance / animationFrames + 0.5; // 固定フレーム数で移動するための速度
+        this.fallSpeed = distance / animationFrames + 0.1; // 固定フレーム数で移動するための速度
     }
 }
 let images = [];
@@ -79,8 +79,7 @@ function answerCheck(word){
 
 let remainingAttempts = 3;
 
-let inner = [3,4,6,7,8,9,11,12,13,15,16,17,18,20,21];
-let cand = [0,1,2,5,10];
+let towers = [10,10,10,10,10]; // 各列の残りパネル数
 
 let isAnimating = false; // アニメーション中フラグ
 
@@ -200,15 +199,15 @@ function calcNewImage(index) {
 }
 
 function make_tweet(res = 0) {
-    score = grid * grid;
+    score = towers.reduce((a, b) => a + b, 0) - 25;
 
-    towers = [10,10,10,10,10];
-    for (let i = 0; i < actionLog.length; i++) {
-        if (actionLog[i] > -1) {
-            score -= 1;
-            towers[actionLog[i]]--;
-        }
-    }
+    // towers = [10,10,10,10,10];
+    // for (let i = 0; i < actionLog.length; i++) {
+    //     if (actionLog[i] > -1) {
+    //         score -= 1;
+    //         towers[actionLog[i]]--;
+    //     }
+    // }
 
     attempt = 3 - remainingAttempts + 1;
 
@@ -351,7 +350,10 @@ function mouseReleased() {
     
     // 同じパネル上で開始・終了し、まだクリックされていない場合
     if (cleared == 0 && startPanel >= 0 && startPanel === endPanel && clicked[startPanel] == 0) {
-        actionLog.push(startPanel%5);
+        if(towers[startPanel % grid] + Math.floor((startPanel - 25) / 5) >= 5) {
+            actionLog.push(startPanel - 25);
+            towers[startPanel % grid]--;
+        }
         clicked[startPanel] = true;
         let newpic = calcNewImage(startPanel);
         showidx[startPanel] = newpic;
