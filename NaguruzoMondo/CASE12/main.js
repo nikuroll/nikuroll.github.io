@@ -89,7 +89,14 @@ let hoveredPanel = -1; // マウスホバー中のパネルインデックス
 
 function preload() {
     for (let i = 0; i < imageNum; i++) {
-        images.push(loadImage(`images/pic(${i}).PNG`));
+        // PNG優先、失敗したらpng
+        let img = null;
+        try {
+            img = loadImage(`images/pic(${i}).PNG`);
+        } catch (e) {
+            img = loadImage(`images/pic(${i}).png`);
+        }
+        images.push(img);
     }
 
     // 全体のパネル数（画面外含む）を初期化
