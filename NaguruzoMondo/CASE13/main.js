@@ -243,6 +243,10 @@ function mouseReleased() {
             drawArea();
             revealed++;
             saveDorosute();
+            drawArea();
+            saveDorosute();
+            drawArea();
+            saveDorosute();
         }
     }
     
