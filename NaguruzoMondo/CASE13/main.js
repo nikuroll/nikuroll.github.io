@@ -43,6 +43,7 @@ function preload() {
 
 function setup() {
     startwidth = min(window.innerWidth, window.innerHeight, 800);
+    pixelDensity(4); // ピクセル密度を4に設定
     const canvas = createCanvas(startwidth, startwidth);
     canvas.parent('canvas');
     background(255);
