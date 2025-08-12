@@ -15,7 +15,7 @@ let actionLog = [];
 
 let tweetMess = "NaguruzoMondoに挑戦中！";
 
-let answers = ["ほうじ","ほゔじ","法事"];
+let answers = ["ほうじ","ほゔじ","法事","ばっど","バッド","ギャップ"];
 
 let remainingAttempts = 3;
 
