@@ -52,6 +52,7 @@ let impactEffect = {
 // サーチライト用の変数
 let searchlights = [];
 let searchlightRadius = 0; // パネル幅の半分（setup内で設定）
+let searchlightRadiusMultiplier = 0.7; // パネル幅に対する半径の倍率（調整可能）
 
 // 赤色フェードエフェクト用
 let redFlashEffect = {
@@ -83,8 +84,8 @@ function setup() {
     cellWidth = width / grid;
     cellHeight = height / grid;
     
-    // サーチライトの半径をパネル幅の半分に設定
-    searchlightRadius = cellWidth / 2;
+    // サーチライトの半径をパラメータで設定
+    searchlightRadius = cellWidth * searchlightRadiusMultiplier;
 
     // 正三角形の3D回転用のパラメータ
     let triangleRadius = width * 0.4; // 三角形の外接円の半径
@@ -141,9 +142,22 @@ function draw() {
     // 赤色フェードエフェクトの更新
     updateRedFlashEffect();
     
-    // アニメーションやエフェクトが動作中でなければサーチライトのみ描画
+    // 画面を描画
+    drawArea();
+    
+    // マウスが押されている間は影を描画
+    if (mouseIsPressed && !ballAnimation.active) {
+        let col = floor(mouseX / cellWidth);
+        let row = floor(mouseY / cellHeight);
+        if (col >= 0 && col < grid && row >= 0 && row < grid) {
+            fill(0, 0, 0, 100); // 半透明の黒
+            noStroke();
+            rect(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
+        }
+    }
+    
+    // アニメーションやエフェクトが動作中でなければここで終了
     if (!ballAnimation.active && !impactEffect.active) {
-        drawArea();
         return;
     }
     
@@ -542,16 +556,6 @@ function mousePressed() {
     // タッチ開始位置を記録
     startX = mouseX;
     startY = mouseY;
-
-    // タッチ中のマスを影で強調（開済みパネルでも可能）
-    let col = floor(mouseX / cellWidth);
-    let row = floor(mouseY / cellHeight);
-
-    if (col >= 0 && col < grid && row >= 0 && row < grid) {
-        fill(0, 0, 0, 100); // 半透明の黒
-        noStroke();
-        rect(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
-    }
 }
 
 function mouseReleased() {
