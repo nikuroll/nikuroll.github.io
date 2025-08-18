@@ -57,20 +57,18 @@ function debugGridState() {
 function checkCompletion() {
     if (!targetGridData) return false;
     
-    // 現在のクリック状況をバイナリ配列に変換
-    let currentPattern = [];
-    for (let i = 0; i < grid * grid; i++) {
-        currentPattern.push(clicked[i]);
-    }
-    
-    // 目標パターンと比較
+    // 目標パターンと比較し、全て同じか全て違うならtrue
+    all_true = true;
+    all_false = true;
     for (let i = 0; i < targetGridData.length; i++) {
-        if (currentPattern[i] !== targetGridData[i]) {
-            return false;
+        if (clicked[i] == targetGridData[i]) {
+            all_false = false; // 目標パターンと同じならfalse
+        }else{
+            all_true = false; // 目標パターンと違うならtrue
         }
     }
     
-    return true;
+    return all_true || all_false; // 全て同じか全て違うならtrue
 }
 function loadGridFromURL() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -179,8 +177,8 @@ function addGridImageToArray(binaryArray) {
 // グリッド画像を描画する共通関数
 function drawGridImages() {
     if (images.length > imageNum) {
-        let displaySize = 120;
-        let spacing = 20;
+        let displaySize = cellWidth * 1.35;
+        let spacing = 10;
         
         // URLから読み込んだ場合（元の画像 + 変換後の画像）
         if (images.length >= imageNum + 2) {
@@ -201,13 +199,7 @@ function drawGridImages() {
                 let transformedX = (width - displaySize) / 2;
                 let transformedY = height - displaySize - spacing;
                 image(transformedImg, transformedX, transformedY, displaySize, displaySize);
-                
-                // ラベルを追加
-                fill(0);
-                textAlign(CENTER);
-                textSize(12);
-                text("元の画像", originalX + displaySize/2, originalY - 5);
-                text("変換後", transformedX + displaySize/2, transformedY - 5);
+
             }
         }
     }
@@ -233,6 +225,12 @@ function setup() {
 
     cellWidth = width / grid;
     cellHeight = height / grid;
+
+    // // クイズコンテナ全体を非表示にする
+    // const quizContainer = document.querySelector('.quiz-container');
+    // if (quizContainer) {
+    //     quizContainer.style.display = 'none';
+    // }
 
     // URLパラメータからグリッドデータを読み込み
     let loadedFromURL = loadGridFromURL();
@@ -389,6 +387,8 @@ function mouseReleased() {
                 showidx[index] = index + 1; // 1-indexに修正
                 revealed--;
             }
+        }else{
+            return;
         }
     }
     
@@ -424,11 +424,6 @@ if (submitButton) {
 }
 
 function showResultButtons(tweetMess) {
-    // クイズコンテナ全体を非表示にする
-    const quizContainer = document.querySelector('.quiz-container');
-    if (quizContainer) {
-        quizContainer.style.display = 'none';
-    }
 
     // すでにボタンが表示されていれば何もしない
     if (document.getElementById('result-buttons')) return;
@@ -501,6 +496,13 @@ function drawArea() {
         }
     }
     blendMode(BLEND);
+
+    if (cleared == 0 & checkCompletion()) {
+        alert('正解！');
+        cleared = 1;
+        tweetMess = make_tweet(0);
+        showResultButtons(tweetMess);
+    }
 }
 
 function allOpen() {
