@@ -429,6 +429,11 @@ if (submitButton) {
 }
 
 function showResultButtons(tweetMess) {
+    // クイズコンテナ全体を非表示にする
+    const quizContainer = document.querySelector('.quiz-container');
+    if (quizContainer) {
+        quizContainer.style.display = 'none';
+    }
 
     // すでにボタンが表示されていれば何もしない
     if (document.getElementById('result-buttons')) return;
