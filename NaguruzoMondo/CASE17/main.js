@@ -176,6 +176,43 @@ function addGridImageToArray(binaryArray) {
     return -1;
 }
 
+// グリッド画像を描画する共通関数
+function drawGridImages() {
+    if (images.length > imageNum) {
+        let displaySize = 120;
+        let spacing = 20;
+        
+        // URLから読み込んだ場合（元の画像 + 変換後の画像）
+        if (images.length >= imageNum + 2) {
+            let originalImg, transformedImg;
+            
+            // 最新の2つの画像を使用
+            let numGridImages = images.length - imageNum;
+            if (numGridImages >= 2) {
+                originalImg = images[images.length - 2]; // 最後から2番目（元の画像）
+                transformedImg = images[images.length - 1]; // 最後（変換後の画像）
+                
+                // 元の画像を左下側に配置
+                let originalX = spacing;
+                let originalY = height - displaySize - spacing;
+                image(originalImg, originalX, originalY, displaySize, displaySize);
+                
+                // 変換後の画像を下側（中央）に配置
+                let transformedX = (width - displaySize) / 2;
+                let transformedY = height - displaySize - spacing;
+                image(transformedImg, transformedX, transformedY, displaySize, displaySize);
+                
+                // ラベルを追加
+                fill(0);
+                textAlign(CENTER);
+                textSize(12);
+                text("元の画像", originalX + displaySize/2, originalY - 5);
+                text("変換後", transformedX + displaySize/2, transformedY - 5);
+            }
+        }
+    }
+}
+
 function preload() {
     for (let i = 0; i < imageNum; i++) {
         images.push(loadImage(`images/pic(${i}).PNG`));
@@ -233,60 +270,8 @@ function setup() {
         }
     }
     
-    // グリッド画像がある場合はパネルの下に表示
-    if (images.length > imageNum) {
-        let displaySize = 120;
-        let spacing = 20;
-        
-        // URLから読み込んだ場合（元の画像 + 変換後の画像）
-        if (loadedFromURL && images.length >= imageNum + 2) {
-            let originalImg = images[imageNum]; // 元の画像
-            let transformedImg = images[imageNum + 1]; // 変換後の画像
-            
-            // 元の画像を左下側に配置
-            let originalX = spacing;
-            let originalY = height - displaySize - spacing;
-            image(originalImg, originalX, originalY, displaySize, displaySize);
-            
-            // 変換後の画像を下側（中央）に配置
-            let transformedX = (width - displaySize) / 2;
-            let transformedY = height - displaySize - spacing;
-            image(transformedImg, transformedX, transformedY, displaySize, displaySize);
-            
-            // ラベルを追加
-            fill(0);
-            textAlign(CENTER);
-            textSize(12);
-            text("元の画像", originalX + displaySize/2, originalY - 5);
-            text("変換後", transformedX + displaySize/2, transformedY - 5);
-        }
-        // テストパターンの場合（複数の画像がある）
-        else if (images.length > imageNum) {
-            // 最新の2つの画像を表示
-            let numGridImages = images.length - imageNum;
-            if (numGridImages >= 2) {
-                let originalImg = images[images.length - 2]; // 最後から2番目
-                let transformedImg = images[images.length - 1]; // 最後
-                
-                // 元の画像を左下側に配置
-                let originalX = spacing;
-                let originalY = height - displaySize - spacing;
-                image(originalImg, originalX, originalY, displaySize, displaySize);
-                
-                // 変換後の画像を下側（中央）に配置
-                let transformedX = (width - displaySize) / 2;
-                let transformedY = height - displaySize - spacing;
-                image(transformedImg, transformedX, transformedY, displaySize, displaySize);
-                
-                // ラベルを追加
-                fill(0);
-                textAlign(CENTER);
-                textSize(12);
-                text("元の画像", originalX + displaySize/2, originalY - 5);
-                text("変換後", transformedX + displaySize/2, transformedY - 5);
-            }
-        }
-    }
+    // グリッド画像を描画
+    drawGridImages();
   
 }
 
@@ -383,18 +368,11 @@ function mouseReleased() {
         return false; // 右クリックを無効化
     }
     
-    // 多重クリック対策
-    let doAction = false;
-    if (frameCount - lastClickFrame >= 2) {
-        lastClickFrame = frameCount;
-        doAction = true;
-    }
-    
-    if (pressedCell !== null && cleared == 0 && floor(startX / cellWidth) === floor(mouseX / cellWidth) && floor(startY / cellHeight) === floor(mouseY / cellHeight)) {
+    if (cleared == 0 && floor(startX / cellWidth) === floor(mouseX / cellWidth) && floor(startY / cellHeight) === floor(mouseY / cellHeight)) {
         let col = floor(mouseX / cellWidth);
         let row = floor(mouseY / cellHeight);
 
-        if (col >= 0 && col < grid && row >= 0 && row < grid && doAction) {
+        if (col >= 0 && col < grid && row >= 0 && row < grid) {
             let index = row * grid + col;
             
             if (clicked[index] == 0) {
@@ -411,30 +389,9 @@ function mouseReleased() {
                 showidx[index] = index + 1; // 1-indexに修正
                 revealed--;
             }
-            
-            // TODO: 正誤判定を実行
-            // if (checkCompletion()) {
-            //     alert('正解！');
-            //     tweetMess = make_tweet();
-            //     cleared = 1;
-            //     
-            //     let gridData = getCurrentGridData();
-            //     if (gridData) {
-            //         const currentUrl = new URL(window.location);
-            //         currentUrl.searchParams.set('ac', gridData);
-            //         window.history.replaceState({}, '', currentUrl);
-            //     }
-            //     
-            //     navigator.clipboard.writeText(window.location.href).then(function() {
-            //         console.log('URL copied to clipboard');
-            //     }, function() {
-            //         console.log('Failed to copy URL');
-            //     });
-            // }
         }
     }
     
-    pressedCell = null; // 必ず解除
     drawArea();
 }
 
@@ -526,26 +483,8 @@ function drawArea() {
 
     image(images[backgroundIndex], 0, 0, width, height);
 
-    // グリッド画像をパネルの下に描画
-    if (images.length > imageNum) {
-        let displaySize = 100;
-        
-        // 最新の2つの画像を表示（元の画像と変換後の画像）
-        let numGridImages = images.length - imageNum;
-        if (numGridImages >= 2) {
-            let originalImg = images[images.length - 2]; // 最後から2番目（元の画像）
-            let transformedImg = images[images.length - 1]; // 最後（変換後の画像）
-            
-            // パネルエリアの下に配置
-            let originalX = 50;
-            let originalY = height - displaySize - 50;
-            image(originalImg, originalX, originalY, displaySize, displaySize);
-            
-            let transformedX = width - displaySize - 50;
-            let transformedY = height - displaySize - 50;
-            image(transformedImg, transformedX, transformedY, displaySize, displaySize);
-        }
-    }
+    // グリッド画像を描画
+    drawGridImages();
 
     blendMode(ADD);
     for (let i = 0; i < grid; i++) {
