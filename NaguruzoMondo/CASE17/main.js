@@ -74,7 +74,13 @@ function loadGridFromURL() {
     const urlParams = new URLSearchParams(window.location.search);
     const gridData = urlParams.get('ac');
     
-    if (gridData && gridData.length === 25) {
+    // すべて0 すべて1の場合をはじきたい
+    valid = true;
+    if (gridData === '0'.repeat(25) || gridData === '1'.repeat(25)) {
+        valid = false;
+    }
+
+    if (gridData && gridData.length === 25 & valid) {
         // 01データからグリッド画像を生成
         let binaryArray = [];
         for (let i = 0; i < 25; i++) {
@@ -97,8 +103,6 @@ function loadGridFromURL() {
             addGridImageToArray(transformedArray);
         }
         
-        console.log('URLからグリッドデータを読み込み、元の画像と変換後の画像を生成しました:', gridData);
-        console.log('目標パターン:', targetGridData);
         return true;
     }
     return false;
@@ -238,11 +242,12 @@ function setup() {
     if (!loadedFromURL) {
         // URLにデータがない場合はテスト用のグリッドパターンを生成
         let testPattern1 = [
-            1,0,1,0,1,
-            0,1,0,1,0,
-            1,0,1,0,1,
-            0,1,0,1,0,
-            1,0,1,0,1
+            0, 0, 0,
+            0, 1, 0, 1, 0,
+            0, 0, 0, 0, 0,
+            1, 0, 0, 0, 1,
+            0, 1, 1, 1, 0,
+            1, 1
         ];
         
         // 元のパターンを保存
@@ -268,8 +273,8 @@ function setup() {
         }
     }
     
-    // グリッド画像を描画
-    drawGridImages();
+    // // グリッド画像を描画
+    // drawGridImages();
   
 }
 
@@ -288,7 +293,7 @@ function make_tweet(res = 0) {
     attempt = 3 - remainingAttempts + 1;
 
     if (res == 0) {
-        tweetText = `CASE${nazoid}\n\nScore: ${score}/${grid * grid} (${attempt}回目)\n`;
+        tweetText = `CASE${nazoid}\n\nScore: ${score}/${grid * grid}\n`;
     }
     for (let i = 0; i < grid; i++) {
         ret = "";
@@ -416,7 +421,7 @@ if (submitButton) {
             remainingAttempts--;
             document.getElementById('remainingAttempts').textContent = `残り解答回数: ${remainingAttempts}`;
 
-            alert(`ちがいます`);
+            alert(`意味ないよ`);
 
             actionLog.push(-1);
         }
