@@ -25,7 +25,7 @@ let FISH_SIZE_MAX; // 最大サイズ（setup内で設定）
 
 let tweetMess = "NaguruzoMondoに挑戦中！";
 
-let answers = [""];
+let answers = [];
 
 let remainingAttempts = 3;
 
