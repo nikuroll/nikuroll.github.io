@@ -13,7 +13,7 @@ let revealed = 0;
 
 let actionLog = [];
 
-let shadowCell = { row: -1, col: -1, active: false }; // 影の状態管理
+let shadowPanel = null; // 影の対象パネル（nullは影がない状態）
 
 let tweetMess = "NaguruzoMondoに挑戦中！";
 
@@ -28,7 +28,7 @@ let revealedQuestions = 0;
 let panels = [];
 
 // アニメーション関連
-let animationSpeed = 0.1; // パネルの移動速度
+let animationSpeed = 0.0003; // パネルの移動速度（小さい値ほど滑らかにゆっくり動く）
 let time = 0; // アニメーションタイマー
 
 function preload() {
@@ -48,9 +48,8 @@ class Panel {
         this.gridIndex = gridIndex;  // 元のグリッドインデックス（0-24）
         this.imgIndex = imgIndex;    // 表示する画像のインデックス
         this.clicked = false;        // クリック状態
-        this.isOuter = isOuter;      // 外側パネルかどうか
         
-        // 元のグリッド位置
+        // 元のグリッド位置（表示用の初期位置として保持）
         this.baseRow = Math.floor(gridIndex / grid);
         this.baseCol = gridIndex % grid;
         
@@ -58,40 +57,42 @@ class Panel {
         this.row = this.baseRow;
         this.col = this.baseCol;
         
-        // リサージュ曲線のパラメータ（各パネルで少しずつ異なる値に）
-        this.freqX = 0.2 + (gridIndex % 5) * 0.01;  // X方向の周波数
-        this.freqY = 0.3 + (Math.floor(gridIndex / 5)) * 0.01;  // Y方向の周波数
-        this.phaseX = gridIndex * 0.2;  // X方向の位相
-        this.phaseY = gridIndex * 0.3;  // Y方向の位相
-        this.amplitude = isOuter ? 0.45 : 0.25;  // 振幅（外側と内側で異なる値）
-        
-        // グリッド中の位置に応じてリサージュパラメータを調整
-        if (isOuter) {
-            // 外側パネルはより大きく動く
-            if (this.baseRow === 0 || this.baseRow === grid-1) {
-                // 上下の辺は左右に大きく移動
-                this.freqX *= 1.2;
-                this.freqY *= 0.8;
-            } else {
-                // 左右の辺は上下に大きく移動
-                this.freqX *= 0.8;
-                this.freqY *= 1.2;
-            }
-        } else {
-            // 内側パネルは中心を軸に回るような動き
-            this.phaseX += Math.PI / 4;  // 45度ずらす
-        }
+        // 軌道上の位置パラメータ（0～1の範囲、各パネルは等間隔に配置）
+        this.pathPosition = gridIndex / (grid * grid); // 0～1の間で等間隔に配置
     }
     
     // パネルの位置を更新
     update() {
-        // リサージュ曲線に沿って位置を更新
-        const offsetX = this.amplitude * Math.sin(time * this.freqX + this.phaseX);
-        const offsetY = this.amplitude * Math.sin(time * this.freqY + this.phaseY);
+        // 軌道上の位置を更新（0～1の範囲を循環）
+        this.pathPosition = (this.pathPosition + animationSpeed) % 1;
         
-        // 基本位置に連続的なオフセットを適用
-        this.col = this.baseCol + offsetX;
-        this.row = this.baseRow + offsetY;
+        // 盤面全体にまたがるリサージュ曲線を計算
+        // パネルの位置に応じた値を計算
+        this.updatePositionOnPath();
+    }
+    
+    // リサージュ曲線上の位置を計算
+    updatePositionOnPath() {
+        // リサージュ曲線のパラメータ
+        const a = 2.0;       // X方向の振幅
+        const b = 1.5;       // Y方向の振幅
+        const freqX = 1;     // X方向の周波数
+        const freqY = 1;     // Y方向の周波数
+        
+        // パネルの位置に基づいて位相を計算（2πの範囲で）
+        const angle = this.pathPosition * Math.PI * 2;
+        
+        // リサージュ曲線の計算
+        const centerX = (grid - 1) / 2;  // 中心X座標
+        const centerY = (grid - 1) / 2;  // 中心Y座標
+        
+        // 中心を基準にリサージュ曲線の座標を計算
+        const offsetX = a * Math.sin(freqX * angle);
+        const offsetY = b * Math.sin(freqY * angle + Math.PI/2); // 90度ずらして楕円に近い形に
+        
+        // 盤面の中心を基準に座標を設定
+        this.col = centerX + offsetX;
+        this.row = centerY + offsetY;
         
         // 境界を超えないように制限（完全に画面外に出ないように）
         this.col = Math.max(-0.5, Math.min(grid - 0.5, this.col));
@@ -147,34 +148,24 @@ function setup() {
 function initializePanels() {
     panels = [];
     
-    // リサージュパラメータのバリエーション用の配列
-    const freqVariations = [0.2, 0.25, 0.3, 0.35, 0.4];
-    const phaseVariations = [0, Math.PI/6, Math.PI/4, Math.PI/3, Math.PI/2];
+    // パネルの総数
+    const totalPanels = grid * grid;
     
     for (let i = 0; i < grid; i++) {
         for (let j = 0; j < grid; j++) {
             const index = i * grid + j;
             
-            // 外側のパネルかどうかを判定
+            // 外側のパネルかどうかの判定（今回の実装では使用しないが、拡張のために残す）
             const isOuter = i === 0 || i === grid - 1 || j === 0 || j === grid - 1;
             
             // パネルオブジェクトを作成
             const panel = new Panel(index, showidx[index], isOuter);
             
-            // より多様なリサージュパラメータを設定
-            panel.freqX = freqVariations[(i + j) % 5] * (isOuter ? 1.2 : 0.8);
-            panel.freqY = freqVariations[(i * 2 + j) % 5] * (isOuter ? 1.0 : 0.9);
-            panel.phaseX = phaseVariations[j % 5] + index * 0.1;
-            panel.phaseY = phaseVariations[i % 5] + index * 0.12;
+            // 環状の軌道上に等間隔で配置するための位相設定
+            panel.pathPosition = index / totalPanels;
             
-            // 外側と内側でアニメーション特性を変更
-            if (isOuter) {
-                // 外側パネルは大きく動く
-                panel.amplitude = 0.45 + (i * j % 3) * 0.05;
-            } else {
-                // 内側パネルはより小さく、複雑に動く
-                panel.amplitude = 0.15 + (i + j % 4) * 0.05;
-            }
+            // 初期位置を軌道上の位置に合わせる
+            panel.updatePositionOnPath();
             
             panels.push(panel);
         }
@@ -291,11 +282,16 @@ function drawArea() {
     blendMode(BLEND);
     
     // 影の描画
-    if (shadowCell.active) {
+    if (shadowPanel !== null) {
         fill(0, 0, 0, 100); // 半透明の黒
         noStroke();
-        // 実際のパネル位置に合わせて影を表示
-        rect(shadowCell.col * cellWidth, shadowCell.row * cellHeight, cellWidth, cellHeight);
+        // パネルの現在位置に合わせて影を表示
+        rect(
+            shadowPanel.col * cellWidth, 
+            shadowPanel.row * cellHeight, 
+            cellWidth, 
+            cellHeight
+        );
     }
 }
 
@@ -329,10 +325,11 @@ function mousePressed() {
     }
     
     if (clickedPanels.length > 0) {
-        const topPanel = clickedPanels.pop();
-        shadowCell.row = topPanel.row;
-        shadowCell.col = topPanel.col;
-        shadowCell.active = true;
+        // 最後のパネル（配列の最後に追加されたパネル）を影の対象に
+        shadowPanel = clickedPanels.pop();
+    } else {
+        // クリックできるパネルがない場合は影をなくす
+        shadowPanel = null;
     }
 }
 
@@ -341,8 +338,9 @@ function mouseReleased() {
         return false; // 右クリックを無効化
     }
     
-    // 影を非表示にする
-    shadowCell.active = false;
+    // 影の対象をクリア
+    const clickedShadowPanel = shadowPanel;
+    shadowPanel = null;
     
     if (cleared == 0) {
         // マウスが移動していない場合のみ処理（ドラッグ操作を除外）
