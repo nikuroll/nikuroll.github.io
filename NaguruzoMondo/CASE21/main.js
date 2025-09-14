@@ -1,6 +1,6 @@
 let nazoid = 21;
-let imageNum = 51; // 画像の枚数
-let backgroundIndex = 0; // 背景画像のインデックス
+let imageNum = 31; // 画像の枚数
+let backgroundIndex = 30; // 背景画像のインデックス
 let images = [];
 let showidx = [];
 let grid = 5;
@@ -17,8 +17,7 @@ let shadowPanel = null; // 影の対象パネル（nullは影がない状態）
 
 let tweetMess = "NaguruzoMondoに挑戦中！";
 
-let answers = ["こうきゅうばなな", "高級バナナ", "コウキュウバナナ","こうきゅうバナナ"];
-let checkCounter= [0,0,0];
+let answers = ["いかんて"];
 
 let remainingAttempts = 3;
 
@@ -192,7 +191,8 @@ function updatePanels() {
 }
 
 function calcNewImage(index) {
-    return index + 26;
+    ret = [0,1,2,3,2,0,1,0,1,0,1,3,2,1,3,1,3,1,3,2,0,2,0,1,3]
+    return ret[index] + 26;
 }
 
 function make_tweet(res = 0) {
