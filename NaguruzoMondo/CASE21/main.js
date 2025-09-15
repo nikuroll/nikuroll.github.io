@@ -1,5 +1,5 @@
 let nazoid = 21;
-let imageNum = 31; // 画像の枚数
+let imageNum = 32; // 画像の枚数
 let backgroundIndex = 30; // 背景画像のインデックス
 let images = [];
 let showidx = [];
@@ -251,6 +251,10 @@ function tweet(tweet) {
 function drawArea() {
     // 背景をクリアして影をリセット
     background(255);
+
+    if (revealed == grid * grid) {
+        backgroundIndex = 31; // 全部開けたら背景を変える
+    }
     
     // アニメーション用のフレーム計算
     imageFrame = 0;
