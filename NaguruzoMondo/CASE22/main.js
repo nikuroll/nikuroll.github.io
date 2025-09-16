@@ -100,8 +100,8 @@ class Panel {
             this.row += this.scatterVelocityY;
             
             // 速度を徐々に減衰させる
-            this.scatterVelocityX *= 0.98;
-            this.scatterVelocityY *= 0.98;
+            this.scatterVelocityX *= 0.985;
+            this.scatterVelocityY *= 0.985;
         } else {
             // 散布終了：戻るアニメーションを開始
             this.animationState = 'returning';
@@ -145,19 +145,19 @@ class Panel {
         this.animationState = 'scattering';
         this.scatterStartTime = millis();
         
-        // パネルの位置に応じて移動方向を設定
+        // パネルの現在位置に応じて移動方向を設定
         const centerX = (grid - 1) / 2;  // グリッドの中心X座標
         const centerY = (grid - 1) / 2;  // グリッドの中心Y座標
         
-        // 中心方向のベクトルを計算
-        const toCenterX = centerX - this.baseCol;
-        const toCenterY = centerY - this.baseRow;
+        // 現在位置から中心方向のベクトルを計算
+        const toCenterX = centerX - this.col;
+        const toCenterY = centerY - this.row;
         
         // 中心方向の角度を計算
         const toCenterAngle = atan2(toCenterY, toCenterX);
         
         // 中心方向を中心とする180度の範囲でランダムな角度を選択
-        const randomOffset = random(-PI/2, PI/2); // -90度から+90度の範囲
+        const randomOffset = random(-PI/6, PI/6); // -90度から+90度の範囲
         const scatterAngle = toCenterAngle + randomOffset;
         
         // 速度を設定
@@ -167,6 +167,7 @@ class Panel {
         
         // 右折フラグの状態をリセット
         this.rightTurnExecuted = false;
+        this.rightTurnDelay = random(500, 1000); // 右折開始までの時間をランダムに設定
     }
     
     // 右折フラグを設定
