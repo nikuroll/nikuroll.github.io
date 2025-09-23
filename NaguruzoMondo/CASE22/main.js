@@ -70,6 +70,9 @@ class Panel {
         this.rightTurnTime = 0;
         this.rightTurnDelay = 500; // 右折開始までの時間（ミリ秒）
         
+        // パネル回転関連
+        this.rotationAngle = 0; // パネルの回転角度（ラジアン）
+        
         // アニメーション状態
         this.animationState = 'idle'; // 'idle', 'scattering', 'returning'
     }
@@ -102,6 +105,9 @@ class Panel {
             // 速度を徐々に減衰させる
             this.scatterVelocityX *= 0.985;
             this.scatterVelocityY *= 0.985;
+            
+            // 進行方向に基づいて向きを更新
+            this.updateRotationFromVelocity();
         } else {
             // 散布終了：戻るアニメーションを開始
             this.animationState = 'returning';
@@ -122,6 +128,16 @@ class Panel {
         this.rightTurnExecuted = true;
     }
     
+    // 進行方向に基づいてパネルの向きを更新
+    updateRotationFromVelocity() {
+        // 残り枚数が20枚以下の場合のみ回転を適用
+        const remainingPanels = panels.filter(p => !clicked[p.gridIndex]).length;
+        if (remainingPanels <= 20) {
+            // 速度ベクトルから角度を計算
+            this.rotationAngle = atan2(this.scatterVelocityY, this.scatterVelocityX);
+        }
+    }
+    
     // 戻るアニメーションの更新
     updateReturnAnimation() {
         const returnSpeed = 0.1;
@@ -136,6 +152,7 @@ class Panel {
         if (Math.abs(deltaX) < 0.01 && Math.abs(deltaY) < 0.01) {
             this.col = this.baseCol;
             this.row = this.baseRow;
+            this.rotationAngle = 0; // 回転角度もリセット
             this.animationState = 'idle';
         }
     }
@@ -165,6 +182,9 @@ class Panel {
         this.scatterVelocityX = cos(scatterAngle) * speed;
         this.scatterVelocityY = sin(scatterAngle) * speed;
         
+        // 初期の進行方向に基づいて向きを設定
+        this.updateRotationFromVelocity();
+        
         // 右折フラグの状態をリセット
         this.rightTurnExecuted = false;
         this.rightTurnDelay = random(500, 1000); // 右折開始までの時間をランダムに設定
@@ -178,13 +198,38 @@ class Panel {
     // パネルの表示
     display() {
         if (this.imgIndex < images.length) {
+            push(); // 変換マトリックスを保存
+            
+            // パネルの中心点に移動
+            translate(this.col * cellWidth + cellWidth/2, this.row * cellHeight + cellHeight/2);
+            
+            // パネルを回転
+            rotate(this.rotationAngle);
+            
+            // ハイライト表示のチェック
+            const remainingPanels = panels.filter(p => !clicked[p.gridIndex]).length;
+            const shouldHighlight = remainingPanels <= 5 && this.hasRightTurnFlag;
+            
+            if (shouldHighlight) {
+                // ハイライト効果（光る枠）を描画
+                strokeWeight(4);
+                stroke(255, 255, 0, 150 + 100 * sin(millis() * 0.01)); // 黄色の点滅枠
+                fill(255, 255, 0, 30 + 20 * sin(millis() * 0.01)); // 薄い黄色の背景
+                rect(-cellWidth/2 - 2, -cellHeight/2 - 2, cellWidth + 4, cellHeight + 4);
+                noStroke();
+                noFill();
+            }
+            
+            // パネルを描画（中心基準で描画するため座標をずらす）
             image(
                 images[this.imgIndex], 
-                this.col * cellWidth, 
-                this.row * cellHeight, 
+                -cellWidth/2, 
+                -cellHeight/2, 
                 cellWidth, 
                 cellHeight
             );
+            
+            pop(); // 変換マトリックスを復元
         }
     }
     
@@ -492,7 +537,11 @@ if (submitButton) {
             remainingAttempts--;
             document.getElementById('remainingAttempts').textContent = `残り解答回数: ${remainingAttempts}`;
 
-            alert(`ちがいます`);
+            if (revealed == 25){
+                alert(`ちがいます。\nヒント1. 「ち」と「ど」だけ動きがおかしいぞ？\nヒント2.「右折」しているね。\nヒント3.答えは天文学に関係がある言葉になるよ。`);
+            }else{
+                alert(`ちがいます`);
+            }
 
             actionLog.push(-1);
             
