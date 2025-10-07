@@ -185,11 +185,6 @@ function mouseReleased() {
             showidx[index] = newpic;
             drawArea();
             revealed++;
-            saveDorosute();
-            drawArea();
-            saveDorosute();
-            drawArea();
-            saveDorosute();
         }
     }
     
