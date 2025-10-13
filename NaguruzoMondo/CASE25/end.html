@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <link rel="stylesheet" href="../style.css">
+    <title>Naguruzo Mondo - ゲーム完了</title>
+    <style>
+        /* エンディング専用のスタイル */
+        body {
+            background-color: #e9ecef !important;
+        }
+        
+        .ending-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .ending-title {
+            font-size: 3rem;
+            color: #333;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .ending-subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        .dialogue-section {
+            margin: 50px 0;
+        }
+
+        .dialogue-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .dialogue-item.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .dialogue-item.reverse {
+            flex-direction: row-reverse;
+            transform: translateX(50px);
+        }
+
+        .dialogue-item.reverse.show {
+            transform: translateX(0);
+        }
+
+        .character-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid #6c757d;
+            object-fit: cover;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #6c757d, #495057);
+        }
+
+        .speech-bubble {
+            flex: 1;
+            padding: 20px;
+            margin: 0 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+            font-size: 16px;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        .share-section {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            margin: 40px 0;
+        }
+
+        .share-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .share-description {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .share-button {
+            display: inline-block;
+            padding: 12px 30px;
+            font-size: 16px;
+            color: #fff;
+            background: linear-gradient(135deg, #1DA1F2 0%, #0d8bd9 100%);
+            border-radius: 10px;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .share-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(29, 161, 242, 0.3);
+        }
+
+        .progress-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+            border: 1px solid #e9ecef;
+        }
+
+        .progress-info div {
+            margin: 5px 0;
+        }
+
+        @media (max-width: 600px) {
+            .ending-title {
+                font-size: 2rem;
+            }
+            
+            .dialogue-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .dialogue-item.reverse {
+                flex-direction: column;
+            }
+            
+            .character-image {
+                margin-bottom: 15px;
+            }
+            
+            .speech-bubble {
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="ending-container">
+        <h1 class="ending-title">ゲーム完了！</h1>
+        <div class="ending-subtitle">
+            おめでとうございます！全ステージをクリアしました！
+        </div>
+
+        <div class="dialogue-section" id="dialogueSection">
+            <!-- JavaScriptで動的にキャラクターの会話を表示 -->
+        </div>
+
+        <div class="share-section">
+            <div class="share-title">成果をシェアしよう！</div>
+            <div class="share-description">
+                あなたの挑戦をXでシェアして、友達にも挑戦してもらいましょう！
+            </div>
+            <a href="#" id="shareButton" class="share-button">
+                🐦 Xでシェア
+            </a>
+            <div class="progress-info" id="progressInfo">
+                <!-- JavaScriptで進捗情報を表示 -->
+            </div>
+        </div>
+    </div>
+
+    <footer class="back-to-top-footer">
+        <a href="../index.html" class="back-to-top-link">一覧に戻る</a>
+    </footer>
+
+    <script src="end.js"></script>
+</body>
+</html>
