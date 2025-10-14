@@ -6,9 +6,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // URLパラメータから進捗情報を取得
     loadProgressData();
     
-    // 進捗情報を表示
-    displayProgressInfo();
-    
     // キャラクターの会話を開始
     startDialogueSequence();
     
@@ -42,30 +39,6 @@ function loadProgressData() {
     console.log('Progress loaded:', { clicked: clickedData, openedCount: clickedData.filter(x => x === 1).length });
 }
 
-// 進捗情報の表示
-function displayProgressInfo() {
-    const progressInfo = document.getElementById('progressInfo');
-    
-    const clickCount = clickedData.filter(x => x === 1).length;
-    const totalCells = 25;
-    const completionRate = Math.round((clickCount / totalCells) * 100);
-    
-    progressInfo.innerHTML = `
-        <div><strong>🎯 完成度:</strong> ${clickCount}/${totalCells} セル (${completionRate}%)</div>
-        <div><strong>🏆 ステージ:</strong> 全ステージクリア完了</div>
-        <div><strong>🌟 評価:</strong> ${getCompletionMessage(completionRate)}</div>
-    `;
-}
-
-// 完成度に応じたメッセージ
-function getCompletionMessage(rate) {
-    if (rate === 100) return 'パーフェクト！';
-    if (rate >= 80) return '素晴らしい！';
-    if (rate >= 60) return 'よくできました！';
-    if (rate >= 40) return 'がんばりました！';
-    return 'チャレンジ精神旺盛！';
-}
-
 // キャラクター会話のデータ
 const dialogues = [
     {
@@ -81,7 +54,7 @@ const dialogues = [
         text: '解体される納屋の中に、<br>米津玄師がいたのです。'
     },
     {
-        text: '...！'
+        text: 'そうだったのか...！'
     }
 ];
 
@@ -150,7 +123,7 @@ function setupShareButton() {
         e.preventDefault();
         
         // シェア用のテキストを生成
-        const shareText = generateShareText();
+        const shareText = make_tweet();
         
         // XのシェアURL
         const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
@@ -161,20 +134,33 @@ function setupShareButton() {
 }
 
 // シェア用テキストの生成
-function generateShareText() {
-    const clickCount = clickedData.filter(x => x === 1).length;
-    const totalCells = 25;
-    const completionRate = Math.round((clickCount / totalCells) * 100);
-    
-    let shareText = `🎉 CASE25を完全クリア！ 🎉\n\n`;
-    shareText += `📊 成績:\n`;
-    shareText += `・完成度: ${clickCount}/${totalCells} セル (${completionRate}%)\n`;
-    shareText += `・全ステージクリア達成！\n\n`;
-    
-    // 特別なメッセージ
-    shareText += `🏆 ${getCompletionMessage(completionRate)}\n`;
-    
-    shareText += `\n#パズルゲーム #謎解き #CASE25 #ゲーム完了`;
-    
-    return shareText;
+function make_tweet(res = 0) {
+    // clickedDataを使用してスコア計算
+    const openedCount = clickedData.filter(x => x === 1).length;
+    const score = 25 - openedCount;
+
+    if (res == 0) {
+        tweetText = `CASE25 \n\nScore: ${score}/25\n`;
+    }
+    for (let i = 0; i < 5; i++) {
+        ret = "";
+        for (let j = 0; j < 5; j++) {
+            let index = i * 5 + j;
+            if (clickedData[index] == 1) {
+                ret += "⬜";
+            } else {
+                ret += "🟨";
+            }
+        }
+
+        tweetText += ret + "\n";
+    }
+
+    tweetText += `#NaguruzoMondo\n`;
+    // index.htmlのパスを表示
+    const indexPath = location.pathname.replace('/end.html', '/index.html');
+    tweetText += location.origin + indexPath;
+
+    console.log(tweetText);
+    return tweetText;
 }

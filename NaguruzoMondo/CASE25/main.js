@@ -258,14 +258,17 @@ function showVictoryEffect() {
     // Greatテキストを作成
     const greatText = document.createElement('div');
     greatText.textContent = 'Great!';
-    greatText.style.fontSize = '8rem';
+    // レスポンシブなフォントサイズ
+    greatText.style.fontSize = window.innerWidth < 600 ? '4rem' : '8rem';
     greatText.style.fontWeight = 'bold';
     greatText.style.color = '#ff4444';
     greatText.style.textShadow = '0 0 20px rgba(255, 255, 255, 0.9), 0 0 40px rgba(255, 255, 255, 0.7), 0 0 60px rgba(255, 255, 255, 0.5), 0 0 80px rgba(255, 68, 68, 0.8)';
     greatText.style.transform = 'scale(0) rotate(-180deg)';
     greatText.style.transition = 'transform 1s ease-out, opacity 1s ease-out';
     greatText.style.opacity = '0';
-    greatText.style.marginBottom = '50px';
+    greatText.style.marginBottom = window.innerWidth < 600 ? '20px' : '50px';
+    greatText.style.textAlign = 'center';
+    greatText.style.whiteSpace = 'nowrap';
 
     // 人物画像とセリフのコンテナを作成
     const characterContainer = document.createElement('div');
