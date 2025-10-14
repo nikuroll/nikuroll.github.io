@@ -15,7 +15,7 @@ let actionLog = [];
 
 let tweetMess = "NaguruzoMondoに挑戦中！";
 
-let answers = ["米津玄師","よねつけんし","よねづけんし","よねづげんし","よねつげんし"];
+let answers = ["米津玄師","よねつけんし","よねづけんし","よねづげんし","よねつげんし","ハチ","はち"];
 
 let remainingAttempts = 3;
 
@@ -91,8 +91,8 @@ function applyProgressFromMain() {
     const progressParam = urlParams.get('progress');
     
     if (progressParam) {
-        // カンマ区切りのインデックスを配列に変換
-        const openedIndices = progressParam.split(',').map(index => parseInt(index, 10));
+        // ハイフン区切りのインデックスを配列に変換
+        const openedIndices = progressParam.split('-').map(index => parseInt(index, 10));
         
         console.log('Main.jsからの進捗:', openedIndices);
         
@@ -388,8 +388,8 @@ function showVictoryEffect() {
     // レスポンシブなフォントサイズ
     greatText.style.fontSize = window.innerWidth < 600 ? '2.5rem' : '8rem';
     greatText.style.fontWeight = 'bold';
-    greatText.style.color = '#ff4444';
-    greatText.style.textShadow = '0 0 20px rgba(255, 255, 255, 0.9), 0 0 40px rgba(255, 255, 255, 0.7), 0 0 60px rgba(255, 255, 255, 0.5), 0 0 80px rgba(255, 68, 68, 0.8)';
+    greatText.style.color = '#FFD700';
+    greatText.style.textShadow = '0 0 20px rgba(255, 255, 255, 0.9), 0 0 40px rgba(255, 255, 255, 0.7), 0 0 60px rgba(255, 255, 255, 0.5), 0 0 80px rgba(255, 215, 0, 0.8)';
     greatText.style.transform = 'scale(0) rotate(-180deg)';
     greatText.style.transition = 'transform 1s ease-out, opacity 1s ease-out';
     greatText.style.opacity = '0';
@@ -819,7 +819,7 @@ function generateProgressParam() {
     
     // URLパラメータとして返す
     if (openedIndices.length > 0) {
-        return `?progress=${openedIndices.join(',')}`;
+        return `?progress=${openedIndices.join('-')}`;
     }
     
     return '';

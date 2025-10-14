@@ -261,8 +261,8 @@ function showVictoryEffect() {
     // レスポンシブなフォントサイズ
     greatText.style.fontSize = window.innerWidth < 600 ? '4rem' : '8rem';
     greatText.style.fontWeight = 'bold';
-    greatText.style.color = '#ff4444';
-    greatText.style.textShadow = '0 0 20px rgba(255, 255, 255, 0.9), 0 0 40px rgba(255, 255, 255, 0.7), 0 0 60px rgba(255, 255, 255, 0.5), 0 0 80px rgba(255, 68, 68, 0.8)';
+    greatText.style.color = '#FFD700';
+    greatText.style.textShadow = '0 0 20px rgba(255, 255, 255, 0.9), 0 0 40px rgba(255, 255, 255, 0.7), 0 0 60px rgba(255, 255, 255, 0.5), 0 0 80px rgba(255, 215, 0, 0.8)';
     greatText.style.transform = 'scale(0) rotate(-180deg)';
     greatText.style.transition = 'transform 1s ease-out, opacity 1s ease-out';
     greatText.style.opacity = '0';
@@ -422,7 +422,7 @@ function generateProgressParam() {
     
     // パラメータとして返す
     if (openedPanels.length > 0) {
-        return `?progress=${openedPanels.join(',')}`;
+        return `?progress=${openedPanels.join('-')}`;
     } else {
         return '';
     }

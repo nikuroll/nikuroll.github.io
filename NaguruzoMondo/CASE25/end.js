@@ -20,7 +20,7 @@ function loadProgressData() {
     // progress配列の復元（開けたマスのインデックス）
     const progressParam = urlParams.get('progress');
     if (progressParam) {
-        const openedIndices = progressParam.split(',').map(x => parseInt(x));
+        const openedIndices = progressParam.split('-').map(x => parseInt(x));
         
         // 25マスのclicked配列を初期化
         clickedData = new Array(25).fill(0);

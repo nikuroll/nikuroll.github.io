@@ -10,6 +10,10 @@
         /* エンディング専用のスタイル */
         body {
             background-color: #e9ecef !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
         }
         
         .ending-container {
@@ -17,6 +21,8 @@
             margin: 0 auto;
             padding: 40px 20px;
             text-align: center;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .ending-title {
@@ -112,9 +118,25 @@
             line-height: 1.5;
         }
 
-        .music-section iframe {
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            padding-bottom: 177.78%; /* 9:16のアスペクト比 (縦動画) */
+            height: 0;
+            overflow: hidden;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
         }
 
         .share-section {
@@ -157,25 +179,43 @@
 
 
         @media (max-width: 600px) {
+            body {
+                padding: 0 10px;
+            }
+            
             .ending-container {
-                padding: 20px 10px;
+                padding: 20px 15px;
+                margin: 0 auto;
+                max-width: 100%;
+                text-align: center;
             }
             
             .ending-title {
                 font-size: 2rem;
                 line-height: 1.2;
+                text-align: center;
+                margin: 0 auto 10px auto;
             }
             
             .ending-subtitle {
                 font-size: 1rem;
                 line-height: 1.4;
+                text-align: center;
+                margin: 0 auto 30px auto;
+            }
+            
+            .dialogue-section {
+                margin: 30px auto;
+                text-align: center;
             }
             
             .dialogue-item {
                 flex-direction: column;
                 text-align: center;
                 padding: 15px;
-                margin-bottom: 20px;
+                margin: 15px auto 20px auto;
+                max-width: 100%;
+                align-items: center;
             }
             
             .dialogue-item.reverse {
@@ -184,40 +224,73 @@
             
             .character-image {
                 margin-bottom: 15px;
+                margin-left: auto;
+                margin-right: auto;
             }
             
             .speech-bubble {
-                margin: 0;
+                margin: 0 auto;
                 padding: 15px;
                 font-size: 14px;
                 line-height: 1.4;
+                text-align: center;
+                max-width: 100%;
             }
             
             .music-section {
-                padding: 20px;
-                margin: 20px 0;
+                padding: 20px 15px;
+                margin: 20px auto;
+                text-align: center;
+                max-width: 100%;
             }
             
             .music-title {
                 font-size: 1.2rem;
+                text-align: center;
+                margin: 0 auto 10px auto;
             }
             
             .music-description {
                 font-size: 14px;
+                text-align: center;
+                margin: 0 auto 20px auto;
+            }
+            
+            .video-container {
+                max-width: 280px;
+                margin: 20px auto;
+                padding-bottom: 157.14%; /* モバイル用に少し縮める */
             }
             
             .share-section {
-                padding: 20px;
-                margin: 20px 0;
+                padding: 20px 15px;
+                margin: 20px auto;
+                text-align: center;
+                max-width: 100%;
             }
             
             .share-title {
                 font-size: 1.2rem;
+                text-align: center;
+                margin: 0 auto 15px auto;
             }
             
             .share-button {
                 padding: 10px 20px;
                 font-size: 14px;
+                display: inline-block;
+                margin: 0 auto;
+            }
+            
+            .back-to-top-footer {
+                text-align: center;
+                margin: 30px auto 20px auto;
+                padding: 0 15px;
+            }
+            
+            .back-to-top-link {
+                margin: 0 auto;
+                display: inline-block;
             }
         }
     </style>
@@ -230,10 +303,13 @@
         </div>
 
         <div class="music-section">
-            <div class="music-title">エンディングテーマ</div>
-            <div class="music-description">お疲れさまでした。</div>
-            <!-- YouTube埋め込みプレーヤー（URLを置き換えてください） -->
-<iframe width="537" height="954" src="https://www.youtube.com/embed/Nc97Ngf1e4g" title="Naguruzo End" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>       </div>
+            <div class="music-title">エンディングテーマ<br>Naguruzo End</div>
+            <div class="music-description">music lyrics vocal & mix: ひつじ</div>
+            <!-- YouTube埋め込みプレーヤー（レスポンシブ対応） -->
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/Nc97Ngf1e4g" title="Naguruzo End" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            </div>
+        </div>
 
         <div class="dialogue-section" id="dialogueSection">
             <!-- JavaScriptで動的にキャラクターの会話を表示 -->

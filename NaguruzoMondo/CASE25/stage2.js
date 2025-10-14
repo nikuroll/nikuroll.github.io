@@ -82,8 +82,8 @@ function applyProgressFromMain() {
     const progressParam = urlParams.get('progress');
     
     if (progressParam) {
-        // カンマ区切りのインデックスを配列に変換
-        const openedIndices = progressParam.split(',').map(index => parseInt(index, 10));
+        // ハイフン区切りのインデックスを配列に変換
+        const openedIndices = progressParam.split('-').map(index => parseInt(index, 10));
         
         console.log('Main.jsからの進捗:', openedIndices);
         
@@ -384,8 +384,8 @@ function showVictoryEffect() {
     // レスポンシブなフォントサイズ
     greatText.style.fontSize = window.innerWidth < 600 ? '3rem' : '8rem';
     greatText.style.fontWeight = 'bold';
-    greatText.style.color = '#ff4444';
-    greatText.style.textShadow = '0 0 20px rgba(255, 255, 255, 0.9), 0 0 40px rgba(255, 255, 255, 0.7), 0 0 60px rgba(255, 255, 255, 0.5), 0 0 80px rgba(255, 68, 68, 0.8)';
+    greatText.style.color = '#FFD700';
+    greatText.style.textShadow = '0 0 20px rgba(255, 255, 255, 0.9), 0 0 40px rgba(255, 255, 255, 0.7), 0 0 60px rgba(255, 255, 255, 0.5), 0 0 80px rgba(255, 215, 0, 0.8)';
     greatText.style.transform = 'scale(0) rotate(-180deg)';
     greatText.style.transition = 'transform 1s ease-out, opacity 1s ease-out';
     greatText.style.opacity = '0';
@@ -708,7 +708,7 @@ function showHintEffect() {
     // ヒントのテキスト
     const speechText = document.createElement('div');
     // TODO: 実際のヒントメッセージに変更。\nで改行できます
-    const hintContent = '矢印が指している\n指の名前が重要そうです。';
+    const hintContent = '矢印が指している\n指の名前が重要そうです。\n「親」「人」「中」...。';
     speechText.innerHTML = hintContent.replace(/\n/g, '<br>');
     speechBubble.appendChild(speechText);
 
@@ -810,7 +810,7 @@ function generateProgressParam() {
     
     // URLパラメータとして返す
     if (openedIndices.length > 0) {
-        return `?progress=${openedIndices.join(',')}`;
+        return `?progress=${openedIndices.join('-')}`;
     }
     
     return '';
