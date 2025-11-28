@@ -156,6 +156,8 @@ function make_tweet(res = 0) {
 
     if (res == 0) {
         tweetText = `CASE${nazoid}\n\nScore: ${score}/${grid * grid} (${attempt}回目)\n`;
+    } else {
+        tweetText = `CASE${nazoid}に挑戦中！\n\n`;
     }
     for (let i = 0; i < grid; i++) {
         ret = "";
@@ -172,7 +174,7 @@ function make_tweet(res = 0) {
         tweetText += ret + "\n";
     }
 
-    tweetText += `#NaguruzoMondo\n`;
+    tweetText += `#NaguruzoMondo #なぐるぞアドカレ\n`;
     tweetText += location.origin + location.pathname;
 
     console.log(tweetText);
@@ -335,6 +337,15 @@ if (submitButton) {
                 showResultButtons(make_tweet());
             }
         }
+    });
+}
+
+// Add event listener for sharing progress
+const shareButton = document.getElementById('shareProgress');
+if (shareButton) {
+    shareButton.addEventListener('click', () => {
+        const progressTweet = make_tweet(1);
+        tweet(progressTweet);
     });
 }
 
