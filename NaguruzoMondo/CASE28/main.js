@@ -329,13 +329,7 @@ if (submitButton) {
             remainingAttempts--;
             document.getElementById('remainingAttempts').textContent = `残り解答回数: ${remainingAttempts}`;
             
-            if (remainingAttempts > 0) {
-                alert(`ちがいます`);
-            } else {
-                alert('残念！解答回数を使い切りました。');
-                cleared = 1;
-                showResultButtons(make_tweet());
-            }
+            alert(`ちがいます`);
         }
     });
 }
