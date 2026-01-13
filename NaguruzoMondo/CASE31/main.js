@@ -1,5 +1,5 @@
-let nazoid = 30;
-let imageNum = 30; // 画像の枚数
+let nazoid = 31;
+let imageNum = 27; // 画像の枚数
 let backgroundIndex = 26; // 背景画像のインデックス
 let images = [];
 let showidx = [];
