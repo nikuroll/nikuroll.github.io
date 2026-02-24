@@ -59,7 +59,8 @@ function setup() {
 }
 
 function calcNewImage(index) {
-    if(revealed%3==2 || revealed%10==2) {
+    ll = revealed++;
+    if(ll%3==2 || ll%10==2) {
         return 26+index;
     }
     return 51+index;
@@ -291,7 +292,7 @@ function mouseReleased() {
             newpic = calcNewImage(index);
             showidx[index] = newpic;
             drawArea();
-            revealed++;
+            
         }
     }
     
