@@ -60,10 +60,6 @@ function setup() {
 }
 
 function calcNewImage(index) {
-    if (startflg == -1){
-        startflg = 1;
-        return 29;
-    }
     if (imgflg == -1) {
         if (index<5){
             imgflg = 1;
@@ -72,6 +68,10 @@ function calcNewImage(index) {
             imgflg = 0;
             backgroundIndex = 27;
         }
+    }
+    if (startflg == -1){
+        startflg = 1;
+        return 29;
     }
     return 0;
 }
