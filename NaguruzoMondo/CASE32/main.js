@@ -33,7 +33,8 @@ let anim = null;
 
 function preload() {
     for (let i = 0; i < imageNum; i++) {
-        images.push(loadImage(i >= 1 && i <= 25 ? `../images/pic(${i + 25}).PNG` : `images/pic(${i}).PNG`));
+        const imagePath = i <= 25 ? `../images/pic(${i === 0 ? 0 : i + 25}).PNG` : `images/pic(${i}).PNG`;
+        images.push(loadImage(imagePath));
     }
 
     // clicked[tile]（tileは1..25）。0番は未使用。

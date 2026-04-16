@@ -27,7 +27,8 @@ let revealedQuestions = 0;
 
 function preload() {
     for (let i = 0; i < imageNum; i++) {
-        images.push(loadImage(i >= 1 && i <= 25 ? `../images/pic(${i + 25}).PNG` : `images/pic(${i}).PNG`));
+        const imagePath = i <= 25 ? `../images/pic(${i === 0 ? 0 : i + 25}).PNG` : `images/pic(${i}).PNG`;
+        images.push(loadImage(imagePath));
     }
 
     for (let i = 1; i <= grid * grid; i++) {
