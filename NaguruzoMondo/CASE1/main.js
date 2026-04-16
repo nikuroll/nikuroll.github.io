@@ -14,7 +14,7 @@ let tweetMess = "NaguruzoMondoに挑戦中！";
 
 function preload() {
     for (let i = 0; i < 33; i++) {
-        images.push(loadImage(`images/pic(${i}).PNG`));
+        images.push(loadImage(i <= 25 ? `../images/pic(${i}).PNG` : `images/pic(${i}).PNG`));
     }
 
     for (let i = 1; i <= 25; i++) {

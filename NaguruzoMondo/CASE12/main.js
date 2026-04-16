@@ -91,10 +91,14 @@ function preload() {
     for (let i = 0; i < imageNum; i++) {
         // PNG優先、失敗したらpng
         let img = null;
-        try {
-            img = loadImage(`images/pic(${i}).PNG`);
-        } catch (e) {
-            img = loadImage(`images/pic(${i}).png`);
+        if (i <= 25) {
+            img = loadImage(`../images/pic(${i}).PNG`);
+        } else {
+            try {
+                img = loadImage(`images/pic(${i}).PNG`);
+            } catch (e) {
+                img = loadImage(`images/pic(${i}).png`);
+            }
         }
         images.push(img);
     }

@@ -94,7 +94,7 @@ function canOpenPanel(panelNum) {
 
 function preload() {
     for (let i = 0; i < imageNum; i++) {
-        images.push(loadImage(`images/pic(${i}).PNG`));
+        images.push(loadImage(i >= 1 && i <= 25 ? `../images/pic(${i + 25}).PNG` : `images/pic(${i}).PNG`));
     }
 
     // 曜日に応じた背景画像を設定

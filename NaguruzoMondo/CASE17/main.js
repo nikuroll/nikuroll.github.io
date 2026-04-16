@@ -211,7 +211,7 @@ function drawGridImages() {
 
 function preload() {
     for (let i = 0; i < imageNum; i++) {
-        images.push(loadImage(`images/pic(${i}).PNG`));
+        images.push(loadImage(i <= 25 ? `../images/pic(${i}).PNG` : `images/pic(${i}).PNG`));
     }
 
     for (let i = 1; i <= grid * grid; i++) {
