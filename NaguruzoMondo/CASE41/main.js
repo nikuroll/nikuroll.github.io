@@ -2,8 +2,8 @@ const nazoid = 34;
 const grid = 5;
 const backgroundIndex = 26;
 
-const answers = ["chatgpt"];
-const hintMessage = "矢印の色は上から「素色（しろいろ）(#eae5e3)」「銀色」「白色」であり、出題曜日とその二日後の「水」「金」と合わせて考えると4種類の元素を想像することができます。水素、白金、金、水銀の原子番号は1,78,79,80で、元素記号はそれぞれH,Pt,Au,Hgです。";
+const answers = ["へんめん","変面"];
+const hintMessage = "上から、「め＝２１個」「めん＝６個」「へん＝２１個」となります。";
 const explanationMessage = hintMessage;
 
 const tuning = {
