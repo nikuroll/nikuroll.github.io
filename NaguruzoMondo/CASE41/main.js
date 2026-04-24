@@ -38,7 +38,13 @@ const tuning = {
     panelLinearDamping: 0.28,
     panelAngularDamping: 0.3,
     physicsFriction: 0.42,
-    physicsRestitution: 0.08
+    physicsRestitution: 0.08,
+    wrongAnswerJumpSpeedMin: 13,
+    wrongAnswerJumpSpeedMax: 16,
+    wrongAnswerSideDrift: 0.55,
+    wrongAnswerSpinMinDeg: 35,
+    wrongAnswerSpinMaxDeg: 90,
+    wrongAnswerFloorThreshold: 0.42
 };
 
 const roomConfig = {
@@ -73,7 +79,13 @@ const roomConfig = {
     panelLinearDamping: tuning.panelLinearDamping,
     panelAngularDamping: tuning.panelAngularDamping,
     physicsFriction: tuning.physicsFriction,
-    physicsRestitution: tuning.physicsRestitution
+    physicsRestitution: tuning.physicsRestitution,
+    wrongAnswerJumpSpeedMin: tuning.wrongAnswerJumpSpeedMin,
+    wrongAnswerJumpSpeedMax: tuning.wrongAnswerJumpSpeedMax,
+    wrongAnswerSideDrift: tuning.wrongAnswerSideDrift,
+    wrongAnswerSpinMinDeg: tuning.wrongAnswerSpinMinDeg,
+    wrongAnswerSpinMaxDeg: tuning.wrongAnswerSpinMaxDeg,
+    wrongAnswerFloorThreshold: tuning.wrongAnswerFloorThreshold
 };
 
 roomConfig.cubeSize = (roomConfig.width - roomConfig.cubeGap * (grid - 1)) / grid;
@@ -211,7 +223,7 @@ function getImagePath(index) {
 }
 
 function calculateBoardSize() {
-    return Math.max(280, Math.min(window.innerWidth * 0.92, window.innerHeight * 0.72, 800));
+    return Math.max(320, Math.min(window.innerWidth, window.innerHeight, 800));
 }
 
 function syncBoardHostSize() {
@@ -222,15 +234,18 @@ function syncBoardHostSize() {
 
     boardState.boardSize = calculateBoardSize();
     boardHost.style.position = 'relative';
-    boardHost.style.display = 'block';
+    boardHost.style.display = 'flex';
+    boardHost.style.justifyContent = 'center';
+    boardHost.style.alignItems = 'center';
+    boardHost.style.flexDirection = 'column';
     boardHost.style.width = `${boardState.boardSize}px`;
     boardHost.style.height = `${boardState.boardSize}px`;
     boardHost.style.margin = '0 auto';
     boardHost.style.overflow = 'hidden';
-    boardHost.style.borderRadius = '24px';
+    boardHost.style.borderRadius = '0';
     boardHost.style.touchAction = 'manipulation';
-    boardHost.style.background = 'radial-gradient(circle at 50% 18%, rgba(255, 251, 245, 0.98), rgba(222, 206, 184, 0.9) 52%, rgba(131, 94, 63, 0.9) 100%)';
-    boardHost.style.boxShadow = '0 22px 60px rgba(79, 51, 30, 0.28)';
+    boardHost.style.background = 'transparent';
+    boardHost.style.boxShadow = 'none';
 
     return boardHost;
 }
@@ -444,8 +459,8 @@ function createPanels(panelTextures) {
                 (row - halfGrid) * pitch
             );
             cube.rotation.x = 0;
-            cube.rotation.y = (col - halfGrid) * 0.015;
-            cube.rotation.z = (row - halfGrid) * 0.015;
+            cube.rotation.y = (col - halfGrid) * 0.0;
+            cube.rotation.z = (row - halfGrid) * 0.0;
             cube.castShadow = true;
             cube.receiveShadow = true;
             cube.userData.index = index;
@@ -742,6 +757,40 @@ function allOpen() {
     });
 }
 
+function triggerWrongAnswerFloorJump() {
+    for (const panel of boardState.panels) {
+        if (!panel || !panel.body || panel.state !== 'settled') {
+            continue;
+        }
+
+        const isOnFloor = panel.body.position.y <= roomConfig.floorCollisionY + roomConfig.wrongAnswerFloorThreshold;
+        if (!isOnFloor) {
+            continue;
+        }
+
+        const jumpSpeed = THREE.MathUtils.lerp(
+            roomConfig.wrongAnswerJumpSpeedMin,
+            roomConfig.wrongAnswerJumpSpeedMax,
+            Math.random()
+        );
+        const spinRange = THREE.MathUtils.degToRad(roomConfig.wrongAnswerSpinMaxDeg - roomConfig.wrongAnswerSpinMinDeg);
+        const spinBase = THREE.MathUtils.degToRad(roomConfig.wrongAnswerSpinMinDeg);
+        const randomSpin = () => {
+            const direction = Math.random() < 0.5 ? -1 : 1;
+            return direction * (spinBase + Math.random() * spinRange);
+        };
+
+        panel.body.velocity.set(
+            (Math.random() - 0.5) * roomConfig.wrongAnswerSideDrift,
+            jumpSpeed,
+            (Math.random() - 0.5) * roomConfig.wrongAnswerSideDrift
+        );
+        panel.body.angularVelocity.set(randomSpin(), randomSpin(), randomSpin());
+        panel.body.wakeUp();
+        panel.state = 'dropping';
+    }
+}
+
 function handleSubmitAnswer() {
     const answerInput = document.getElementById('answerInput');
     if (!answerInput) {
@@ -768,6 +817,7 @@ function handleSubmitAnswer() {
     }
 
     alert(revealed === grid * grid ? `ちがいます。${hintMessage}` : 'ちがいます');
+    triggerWrongAnswerFloorJump();
     actionLog.push(-1);
 }
 
