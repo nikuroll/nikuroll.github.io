@@ -1,4 +1,4 @@
-const nazoid = 34;
+const nazoid = 41;
 const grid = 5;
 const backgroundIndex = 26;
 
