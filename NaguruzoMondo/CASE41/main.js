@@ -17,7 +17,7 @@ const tuning = {
     cubeDepth: 2.4,
     topInset: 0.06,
     cameraFov: 28,
-    cameraHeight: 32,
+    cameraHeight: 34,
     cameraTargetY: -3.8,
     backgroundInset: 0.01,
     idleFloat: 0.02,
@@ -44,7 +44,7 @@ const tuning = {
     wrongAnswerSideDrift: 0.55,
     wrongAnswerSpinMinDeg: 35,
     wrongAnswerSpinMaxDeg: 90,
-    wrongAnswerFloorThreshold: 0.42
+    wrongAnswerFloorThreshold: 30
 };
 
 const roomConfig = {
