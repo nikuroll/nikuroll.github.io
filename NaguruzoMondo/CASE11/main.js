@@ -30,7 +30,7 @@ let ichigekipos = [0,1,4,5,6,8,9,10,11,13,14,15,16,17,18,19,21,23];
     
 function preload() {
     for (let i = 0; i < imageNum; i++) {
-        images.push(loadImage(i <= 25 ? `../images/pic(${i}).PNG` : `images/pic(${i}).PNG`));
+        images.push(loadImage(`images/pic(${i}).PNG`));
     }
 
     for (let i = 1; i <= grid*grid; i++) {
