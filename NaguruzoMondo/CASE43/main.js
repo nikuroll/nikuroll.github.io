@@ -46,10 +46,16 @@ const tuning = {
     wrongAnswerSpinMaxDeg: 90,
     wrongAnswerFloorThreshold: 30,
     terrainSegments: 10,
-    terrainPeakHeight: 16,
-    terrainRoughness: 1.18,
-    terrainJitter: 0.48,
-    terrainOuterDrop: 1.1,
+    terrainJitter: 0.24,
+    terrainHeightScale: 12,
+    terrainBaseOffset: 0,
+    terrainNoiseScale: 18,
+    terrainNoiseOctaves: 3,
+    terrainNoisePersistence: 0.32,
+    terrainNoiseLacunarity: 1.65,
+    terrainNoiseSeedOffsetX: 19.7,
+    terrainNoiseSeedOffsetZ: -31.4,
+    terrainEdgeFalloff: 0.08,
     terrainSeed: 43041
 };
 
@@ -93,10 +99,16 @@ const roomConfig = {
     wrongAnswerSpinMaxDeg: tuning.wrongAnswerSpinMaxDeg,
     wrongAnswerFloorThreshold: tuning.wrongAnswerFloorThreshold,
     terrainSegments: tuning.terrainSegments,
-    terrainPeakHeight: tuning.terrainPeakHeight,
-    terrainRoughness: tuning.terrainRoughness,
     terrainJitter: tuning.terrainJitter,
-    terrainOuterDrop: tuning.terrainOuterDrop,
+    terrainHeightScale: tuning.terrainHeightScale,
+    terrainBaseOffset: tuning.terrainBaseOffset,
+    terrainNoiseScale: tuning.terrainNoiseScale,
+    terrainNoiseOctaves: tuning.terrainNoiseOctaves,
+    terrainNoisePersistence: tuning.terrainNoisePersistence,
+    terrainNoiseLacunarity: tuning.terrainNoiseLacunarity,
+    terrainNoiseSeedOffsetX: tuning.terrainNoiseSeedOffsetX,
+    terrainNoiseSeedOffsetZ: tuning.terrainNoiseSeedOffsetZ,
+    terrainEdgeFalloff: tuning.terrainEdgeFalloff,
     terrainSeed: tuning.terrainSeed
 };
 
@@ -145,6 +157,96 @@ function clamp01(value) {
     return Math.max(0, Math.min(1, value));
 }
 
+function fadePerlin(t) {
+    return t * t * t * (t * (t * 6 - 15) + 10);
+}
+
+function lerp(a, b, t) {
+    return a + (b - a) * t;
+}
+
+function createPermutation(seed) {
+    const random = seededRandom(seed);
+    const values = Array.from({ length: 256 }, (_, index) => index);
+
+    for (let i = values.length - 1; i > 0; i--) {
+        const j = Math.floor(random() * (i + 1));
+        [values[i], values[j]] = [values[j], values[i]];
+    }
+
+    return values.concat(values);
+}
+
+function perlinGradient(hash, x, z) {
+    switch (hash & 7) {
+        case 0: return x + z;
+        case 1: return -x + z;
+        case 2: return x - z;
+        case 3: return -x - z;
+        case 4: return x;
+        case 5: return -x;
+        case 6: return z;
+        default: return -z;
+    }
+}
+
+function perlin2(x, z, permutation) {
+    const xi = Math.floor(x) & 255;
+    const zi = Math.floor(z) & 255;
+    const xf = x - Math.floor(x);
+    const zf = z - Math.floor(z);
+    const u = fadePerlin(xf);
+    const v = fadePerlin(zf);
+
+    const aa = permutation[permutation[xi] + zi];
+    const ab = permutation[permutation[xi] + zi + 1];
+    const ba = permutation[permutation[xi + 1] + zi];
+    const bb = permutation[permutation[xi + 1] + zi + 1];
+
+    const x1 = lerp(
+        perlinGradient(aa, xf, zf),
+        perlinGradient(ba, xf - 1, zf),
+        u
+    );
+    const x2 = lerp(
+        perlinGradient(ab, xf, zf - 1),
+        perlinGradient(bb, xf - 1, zf - 1),
+        u
+    );
+
+    return lerp(x1, x2, v);
+}
+
+function fractalPerlin2(x, z, permutation) {
+    let amplitude = 1;
+    let frequency = 1;
+    let total = 0;
+    let amplitudeTotal = 0;
+
+    for (let octave = 0; octave < roomConfig.terrainNoiseOctaves; octave++) {
+        total += perlin2(x * frequency, z * frequency, permutation) * amplitude;
+        amplitudeTotal += amplitude;
+        amplitude *= roomConfig.terrainNoisePersistence;
+        frequency *= roomConfig.terrainNoiseLacunarity;
+    }
+
+    return amplitudeTotal > 0 ? total / amplitudeTotal : 0;
+}
+
+function getTerrainNoiseHeight(posX, posZ, permutation) {
+    const scale = Math.max(0.001, roomConfig.terrainNoiseScale);
+    const noiseX = posX / scale + roomConfig.terrainNoiseSeedOffsetX;
+    const noiseZ = posZ / scale + roomConfig.terrainNoiseSeedOffsetZ;
+    const noise = fractalPerlin2(noiseX, noiseZ, permutation);
+    const edgeDistance = Math.max(
+        Math.abs(posX) / (roomConfig.backgroundWidth / 2),
+        Math.abs(posZ) / (roomConfig.backgroundDepth / 2)
+    );
+    const edgeFalloff = Math.pow(clamp01(edgeDistance), 2) * roomConfig.terrainEdgeFalloff;
+
+    return noise * roomConfig.terrainHeightScale + roomConfig.terrainBaseOffset - edgeFalloff;
+}
+
 function createTerrainData() {
     if (boardState.terrainData) {
         return boardState.terrainData;
@@ -152,6 +254,7 @@ function createTerrainData() {
 
     const segments = roomConfig.terrainSegments;
     const random = seededRandom(roomConfig.terrainSeed);
+    const permutation = createPermutation(roomConfig.terrainSeed ^ 0x9e3779b9);
     const positions = [];
     const uvs = [];
     const indices = [];
@@ -167,14 +270,7 @@ function createTerrainData() {
             const offsetZ = isEdge ? 0 : (random() - 0.5) * jitterZ;
             const posX = x / segments * roomConfig.backgroundWidth - roomConfig.backgroundWidth / 2 + offsetX;
             const posZ = roomConfig.backgroundDepth / 2 - z / segments * roomConfig.backgroundDepth + offsetZ;
-            const nx = posX / (roomConfig.backgroundWidth / 2);
-            const nz = posZ / (roomConfig.backgroundDepth / 2);
-            const distance = Math.sqrt(nx * nx + nz * nz);
-            const centerLift = Math.pow(clamp01(1 - distance), 1.55) * roomConfig.terrainPeakHeight;
-            const roughnessFade = 0.35 + clamp01(distance) * 0.65;
-            const rough = (random() - 0.5) * roomConfig.terrainRoughness * roughnessFade;
-            const outerDrop = Math.pow(clamp01(distance - 0.38), 1.18) * roomConfig.terrainOuterDrop;
-            const baseY = centerLift + rough - outerDrop;
+            const baseY = getTerrainNoiseHeight(posX, posZ, permutation);
 
             positions.push(posX, baseY, posZ);
             uvs.push(x / segments, 1-z / segments);
@@ -237,53 +333,42 @@ function addStaticPhysicsBody(halfExtents, position) {
     return body;
 }
 
-function getTerrainVertex(positions, index) {
-    const offset = index * 3;
-    return new CANNON.Vec3(
-        positions[offset],
-        positions[offset + 1],
-        positions[offset + 2]
-    );
-}
+function createPhysicsTerrainHeights() {
+    const segments = roomConfig.terrainSegments;
+    const permutation = createPermutation(roomConfig.terrainSeed ^ 0x9e3779b9);
+    const heights = [];
 
-function createTerrainTriangleShape(v0, v1, v2) {
-    const thickness = Math.max(0.6, roomConfig.wallThickness * 2);
-    const vertices = [
-        v0,
-        v1,
-        v2,
-        new CANNON.Vec3(v0.x, v0.y - thickness, v0.z),
-        new CANNON.Vec3(v1.x, v1.y - thickness, v1.z),
-        new CANNON.Vec3(v2.x, v2.y - thickness, v2.z)
-    ];
+    for (let x = 0; x <= segments; x++) {
+        const row = [];
+        const posX = x / segments * roomConfig.backgroundWidth - roomConfig.backgroundWidth / 2;
 
-    return new CANNON.ConvexPolyhedron({
-        vertices,
-        faces: [
-            [0, 1, 2],
-            [5, 4, 3],
-            [0, 3, 4, 1],
-            [1, 4, 5, 2],
-            [2, 5, 3, 0]
-        ]
-    });
+        for (let z = 0; z <= segments; z++) {
+            const posZ = roomConfig.backgroundDepth / 2 - z / segments * roomConfig.backgroundDepth;
+            row.push(getTerrainNoiseHeight(posX, posZ, permutation));
+        }
+
+        heights.push(row);
+    }
+
+    return heights;
 }
 
 function createTerrainPhysicsBody() {
-    const terrainData = createTerrainData();
+    const terrainShape = new CANNON.Heightfield(createPhysicsTerrainHeights(), {
+        elementSize: roomConfig.backgroundWidth / roomConfig.terrainSegments
+    });
     const terrainBody = new CANNON.Body({
         mass: 0,
         material: boardState.physicsMaterials.wall
     });
 
-    for (let i = 0; i < terrainData.indices.length; i += 3) {
-        const v0 = getTerrainVertex(terrainData.positions, terrainData.indices[i]);
-        const v1 = getTerrainVertex(terrainData.positions, terrainData.indices[i + 1]);
-        const v2 = getTerrainVertex(terrainData.positions, terrainData.indices[i + 2]);
-        terrainBody.addShape(createTerrainTriangleShape(v0, v1, v2));
-    }
-
-    terrainBody.position.set(0, roomConfig.floorY, 0);
+    terrainBody.addShape(terrainShape);
+    terrainBody.position.set(
+        -roomConfig.backgroundWidth / 2,
+        roomConfig.floorY,
+        roomConfig.backgroundDepth / 2
+    );
+    terrainBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0, 'XYZ');
     boardState.physicsWorld.addBody(terrainBody);
 }
 
