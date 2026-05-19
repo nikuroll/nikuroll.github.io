@@ -1039,7 +1039,7 @@ function handleSubmitAnswer() {
         return;
     }
 
-    remainingAttempts = Math.max(remainingAttempts - 1, 0);
+    remainingAttempts -= 1;
     const remainingAttemptsLabel = document.getElementById('remainingAttempts');
     if (remainingAttemptsLabel) {
         remainingAttemptsLabel.textContent = `残り解答回数: ${remainingAttempts}`;
