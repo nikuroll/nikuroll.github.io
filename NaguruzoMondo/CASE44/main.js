@@ -136,6 +136,54 @@ function searchMarubatsu(nowBoard, turn, depth) {
     return best;
 }
 
+function searchForcedMarubatsuLoss(nowBoard, turn, depth) {
+    const winner = marubatsuWinnerOf(nowBoard);
+    if (winner === "o") {
+        return { score: 1, depth };
+    }
+    if (winner === "x") {
+        return { score: -1, depth };
+    }
+
+    const cells = openMarubatsuCells(nowBoard);
+    if (cells.length === 0) {
+        return { score: 0, depth };
+    }
+
+    let best = null;
+    for (let i = 0; i < cells.length; i++) {
+        const cell = cells[i];
+        nowBoard[cell] = turn;
+        const result = searchForcedMarubatsuLoss(nowBoard, turn === "o" ? "x" : "o", depth + 1);
+        nowBoard[cell] = "";
+
+        if (!best) {
+            best = result;
+        } else if (turn === "x" && isBetterForMaru(result, best)) {
+            best = result;
+        } else if (turn === "o" && isBetterForMaru(best, result)) {
+            best = result;
+        }
+    }
+    return best;
+}
+
+function isBetterLosingMove(candidate, best) {
+    if (!best) {
+        return true;
+    }
+    if (candidate.forced.score !== best.forced.score) {
+        return candidate.forced.score > best.forced.score;
+    }
+    if (candidate.normal.score !== best.normal.score) {
+        return candidate.normal.score > best.normal.score;
+    }
+    if (candidate.normal.score === 1) {
+        return candidate.normal.depth < best.normal.depth;
+    }
+    return candidate.normal.depth > best.normal.depth;
+}
+
 function findLosingBatsuMove(board) {
     let losingMove = -1;
     let best = null;
@@ -143,11 +191,14 @@ function findLosingBatsuMove(board) {
     for (let i = 0; i < cells.length; i++) {
         const cell = cells[i];
         board[cell] = "x";
-        const result = searchMarubatsu(board, "o", 1);
+        const candidate = {
+            forced: searchForcedMarubatsuLoss(board, "o", 1),
+            normal: searchMarubatsu(board, "o", 1)
+        };
         board[cell] = "";
 
-        if (isBetterForMaru(result, best)) {
-            best = result;
+        if (isBetterLosingMove(candidate, best)) {
+            best = candidate;
             losingMove = cell;
         }
     }
