@@ -12,6 +12,8 @@ let startX, startY;
 let clicked = [];
 let cleared = 0;
 let revealed = 0;
+let blackHoleTriggered = false;
+let blackHoleAbsorbStartMs = 0;
 
 let actionLog = [];
 
@@ -35,6 +37,9 @@ const drosteParams = {
 
 const DROSTE_AUTO_ZOOM_SECONDS = -5;
 let drosteAnimationStartMs = 0;
+
+const BLACK_HOLE_INDEX = 12;
+const BLACK_HOLE_ABSORB_MS = 1800;
 
 const drosteVertexShaderSource = `
 attribute vec2 a_position;
@@ -335,6 +340,109 @@ function tweet(tweet) {
 function drawSpecial() {
 }
 
+function isBlackHoleActive() {
+    return clicked[BLACK_HOLE_INDEX] == 1 && !blackHoleTriggered && cleared == 0;
+}
+
+function getBlackHoleRadius() {
+    return min(cellWidth, cellHeight) * 0.34;
+}
+
+function isBlackHoleClick(x, y) {
+    if (!isBlackHoleActive()) return false;
+
+    const dx = x - width / 2;
+    const dy = y - height / 2;
+    return sqrt(dx * dx + dy * dy) <= getBlackHoleRadius();
+}
+
+function easeInCubic(t) {
+    return t * t * t;
+}
+
+function getBlackHoleAbsorbProgress() {
+    if (!blackHoleTriggered) return 0;
+
+    return min((performance.now() - blackHoleAbsorbStartMs) / BLACK_HOLE_ABSORB_MS, 1);
+}
+
+function triggerBlackHoleAbsorption() {
+    if (blackHoleTriggered) return;
+
+    blackHoleTriggered = true;
+    blackHoleAbsorbStartMs = performance.now();
+    actionLog.push(BLACK_HOLE_INDEX);
+}
+
+function finishBlackHoleAbsorption() {
+    for (let i = 0; i < grid * grid; i++) {
+        clicked[i] = 1;
+        showidx[i] = calcNewImage(i);
+    }
+    revealed = grid * grid;
+}
+
+function drawBlackHole() {
+    const cx = width / 2;
+    const cy = height / 2;
+    const radius = getBlackHoleRadius();
+    const pulse = 0.5 + 0.5 * sin(millis() * 0.004);
+
+    push();
+    noStroke();
+    drawingContext.save();
+    drawingContext.filter = `blur(${8 + pulse * 5}px)`;
+
+    fill(0, 0, 0, 170);
+    ellipse(cx, cy, radius * 2.45, radius * 2.45);
+
+    fill(18, 12, 38, 155);
+    ellipse(cx, cy, radius * 1.75, radius * 1.75);
+
+    drawingContext.restore();
+
+    fill(0, 0, 0, 245);
+    ellipse(cx, cy, radius * 1.22, radius * 1.22);
+
+    noFill();
+    strokeWeight(max(2, width * 0.004));
+    stroke(120, 90, 190, 120 + pulse * 70);
+    ellipse(cx, cy, radius * (1.52 + pulse * 0.12), radius * (0.72 + pulse * 0.06));
+    stroke(230, 230, 255, 55);
+    ellipse(cx, cy, radius * (1.92 - pulse * 0.1), radius * (0.9 - pulse * 0.04));
+    pop();
+}
+
+function drawPanelImage(index, x, y, w, h) {
+    if (showidx[index] < images.length && showidx[index] > 0) {
+        image(images[showidx[index]], x, y, w, h);
+    }
+}
+
+function drawAbsorbingPanel(index, x, y, w, h, progress) {
+    if (!(showidx[index] < images.length && showidx[index] > 0)) return;
+
+    const eased = easeInCubic(progress);
+    const cx = x + w / 2;
+    const cy = y + h / 2;
+    const targetX = width / 2;
+    const targetY = height / 2;
+    const currentX = lerp(cx, targetX, eased);
+    const currentY = lerp(cy, targetY, eased);
+    const sizeScale = max(1 - eased, 0.02);
+    const spin = (index - BLACK_HOLE_INDEX) * 0.22 + eased * TWO_PI * 1.4;
+
+    push();
+    translate(currentX, currentY);
+    rotate(spin);
+    tint(255, 255 * max(1 - progress * 0.7, 0));
+    imageMode(CENTER);
+    image(images[showidx[index]], 0, 0, w * sizeScale, h * sizeScale);
+    imageMode(CORNER);
+    noTint();
+    pop();
+}
+
 function drawArea() {
     // 背景と画像を再描画して影を消す
     background(255);
@@ -343,6 +451,13 @@ function drawArea() {
         drawingContext.drawImage(drosteBackgroundCanvas, 0, 0, width, height);
     } else {
         image(images[backgroundIndex], 0, 0, width, height);
+    }
+
+    drawBlackHole();
+
+    const absorbProgress = getBlackHoleAbsorbProgress();
+    if (blackHoleTriggered && absorbProgress >= 1) {
+        finishBlackHoleAbsorption();
     }
     
     for (let i = 0; i < grid; i++) {
@@ -354,8 +469,10 @@ function drawArea() {
                 blendMode(MULTIPLY);
             }
    
-            if (showidx[index] < images.length && showidx[index] > 0) {
-                image(images[showidx[index]], j * cellWidth, i * cellHeight, cellWidth, cellHeight);
+            if (blackHoleTriggered && absorbProgress < 1) {
+                drawAbsorbingPanel(index, j * cellWidth, i * cellHeight, cellWidth, cellHeight, absorbProgress);
+            } else {
+                drawPanelImage(index, j * cellWidth, i * cellHeight, cellWidth, cellHeight);
             }
  
         }
@@ -474,6 +591,9 @@ function mousePressed() {
     if (mouseButton === RIGHT) {
         return false; // 右クリックを無効化
     }
+    if (blackHoleTriggered) {
+        return;
+    }
     // タッチ開始位置を記録
     startX = mouseX;
     startY = mouseY;
@@ -496,9 +616,18 @@ function mouseReleased() {
     if (mouseButton === RIGHT) {
         return false; // 右クリックを無効化
     }
+    if (blackHoleTriggered) {
+        return;
+    }
     if (cleared == 0 && floor(startX / cellWidth) === floor(mouseX / cellWidth) && floor(startY / cellHeight) === floor(mouseY / cellHeight)) {
         let col = floor(mouseX / cellWidth);
         let row = floor(mouseY / cellHeight);
+
+        if (isBlackHoleClick(mouseX, mouseY)) {
+            triggerBlackHoleAbsorption();
+            drawArea();
+            return;
+        }
 
         if (clicked[row * grid + col] == 0 && col >= 0 && col < grid && row >= 0 && row < grid) {
             let index = row * grid + col;
