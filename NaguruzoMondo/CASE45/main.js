@@ -40,6 +40,7 @@ let drosteAnimationStartMs = 0;
 
 const BLACK_HOLE_INDEX = 12;
 const BLACK_HOLE_ABSORB_MS = 1800;
+const MAX_RENDER_PIXEL_DENSITY = 1.5;
 
 const drosteVertexShaderSource = `
 attribute vec2 a_position;
@@ -232,13 +233,21 @@ function createDrosteRenderer(sourceImage, targetWidth, targetHeight) {
     };
 }
 
+function getRenderPixelDensity() {
+    return min(window.devicePixelRatio || 1, MAX_RENDER_PIXEL_DENSITY);
+}
+
 function createDrosteBackground(sourceImage, targetWidth, targetHeight, params = drosteParams) {
+    const density = getRenderPixelDensity();
+    const renderWidth = max(1, floor(targetWidth * density));
+    const renderHeight = max(1, floor(targetHeight * density));
+
     if (
         !drosteRenderer ||
-        drosteRenderer.width !== targetWidth ||
-        drosteRenderer.height !== targetHeight
+        drosteRenderer.width !== renderWidth ||
+        drosteRenderer.height !== renderHeight
     ) {
-        drosteRenderer = createDrosteRenderer(sourceImage, targetWidth, targetHeight);
+        drosteRenderer = createDrosteRenderer(sourceImage, renderWidth, renderHeight);
     }
 
     return drosteRenderer ? drosteRenderer.render(params) : null;
@@ -261,6 +270,7 @@ function getAnimatedDrosteParams() {
 }
 
 function setup() {
+    pixelDensity(getRenderPixelDensity());
     startwidth = min(window.innerWidth, window.innerHeight, 800);
     const canvas = createCanvas(startwidth, startwidth);
     canvas.parent('canvas');
