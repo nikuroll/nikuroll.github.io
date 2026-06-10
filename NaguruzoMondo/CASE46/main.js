@@ -19,16 +19,30 @@ let actionLog = [];
 
 let tweetMess = "NaguruzoMondoに挑戦中！";
 
-let answers = ["なす", "茄子", "ナス"];
-let hintMessage = "";
-let explanationMessage = "リアルタイム版ではCASE40は一人一マスしか開けない制約のもとで、共有した盤面上で全員で協力して答えを導き出す形式でした。";
+let answers = ["はつゆき", "初雪", "ハツユキ"];
+let hintMessage = "はる、なつ、あき、ふゆと埋めます。";
+let explanationMessage = "はる、なつ、あき、ふゆと埋めます。答えは「はつゆき」です。";
 
 let remainingAttempts = 3;
 
 let revealedQuestions = 0;
 
-const WORLDLINE_PANEL_INDEX = 12;
+const WORLDLINE_CONTENT = {
+    left: {
+        answers,
+        hintMessage,
+        explanationMessage
+    },
+    right: {
+        answers: ["しゅうう","驟雨","シュウウ"],
+        hintMessage: "しゅん、か、しゅう、とうと埋めます。「しゅ」は１文字として同じ四角に入れましょう。",
+        explanationMessage: "しゅん、か、しゅう、とうと埋めます。「しゅ」は１文字として同じ四角に入れましょう。答えは「しゅうう（驟雨）」です。"
+    }
+};
+
+const WORLDLINE_PANEL_INDICES = [11, 12, 16, 17];
 const WORLDLINE_SPLIT_MS = 1850;
+const WORLDLINE_REUNION_MS = 1850;
 const WORLDLINE_OVERLAY_OPACITY = 0.5;
 const WORLDLINE_DARK_OVERLAY_ALPHA = 135;
 const WORLDLINE_DARK_FADE_MS = 900;
@@ -54,6 +68,11 @@ const worldlineRightState = {
     cleared: 0,
     backgroundIndex: WORLDLINE_BACKGROUND_INDICES.right
 };
+
+let worldlineReunionTriggered = false;
+let mergedResultContainer = null;
+let leftClearSnapshot = null;
+let rightClearSnapshot = null;
 
 function preload() {
     for (let i = 0; i < imageNum; i++) {
@@ -146,6 +165,11 @@ function tweet(tweet) {
 }
 
 function drawSpecial() {
+}
+
+function isCorrectAnswer(answer, answerList) {
+    const normalized = answer.trim().toLowerCase();
+    return answerList.some((candidate) => candidate.toLowerCase() === normalized);
 }
 
 function easeWorldlineSplit(t) {
@@ -401,6 +425,75 @@ function makeTweetFromWorldlineState(state) {
     return text;
 }
 
+function countRemainingPanels(panelState) {
+    let score = grid * grid;
+    for (let i = 0; i < grid * grid; i++) {
+        if (panelState[i] == 1) {
+            score--;
+        }
+    }
+    return score;
+}
+
+function captureWorldlineSnapshot(panelState, log) {
+    return {
+        clicked: panelState.slice(),
+        actionLog: log.slice()
+    };
+}
+
+function captureLeftClearSnapshot() {
+    if (!leftClearSnapshot) {
+        leftClearSnapshot = captureWorldlineSnapshot(clicked, actionLog);
+    }
+}
+
+function captureRightClearSnapshot() {
+    if (!rightClearSnapshot) {
+        rightClearSnapshot = captureWorldlineSnapshot(
+            worldlineRightState.clicked,
+            worldlineRightState.actionLog
+        );
+    }
+}
+
+function encodeActionLogForTweet(log) {
+    let palam = "";
+    for (let i = 0; i < log.length; i++) {
+        palam += log[i] == -1 ? "z" : String.fromCharCode(log[i] + 97);
+    }
+    return palam;
+}
+
+function makeMergedWorldlineTweet() {
+    const leftState = leftClearSnapshot || captureWorldlineSnapshot(clicked, actionLog);
+    const rightState = rightClearSnapshot || captureWorldlineSnapshot(
+        worldlineRightState.clicked,
+        worldlineRightState.actionLog
+    );
+    const leftScore = countRemainingPanels(leftState.clicked);
+    const rightScore = countRemainingPanels(rightState.clicked);
+    let text = `CASE${nazoid}\n\nScore: ${leftScore + rightScore}/${grid * grid * 2}\n`;
+
+    for (let i = 0; i < grid; i++) {
+        let ret = "";
+        for (let j = 0; j < grid; j++) {
+            const index = i * grid + j;
+            const openedCount =
+                (leftState.clicked[index] == 1 ? 1 : 0) +
+                (rightState.clicked[index] == 1 ? 1 : 0);
+            ret += openedCount === 2 ? "⬜" : openedCount === 1 ? "🟨" : "🟧";
+        }
+        text += ret + "\n";
+    }
+
+    const leftParam = encodeActionLogForTweet(leftState.actionLog);
+    const rightParam = encodeActionLogForTweet(rightState.actionLog);
+    text += `#NaguruzoMondo\n`;
+    text += `${location.origin}${location.pathname}?acl=${leftParam}&acr=${rightParam}`;
+    return text;
+}
+
 function allOpenRightWorldline() {
     for (let i = 0; i < grid * grid; i++) {
         if (worldlineRightState.clicked[i] == 0) {
@@ -453,7 +546,7 @@ function showRightWorldlineResultButtons(tweetMessage) {
     openButton.style.cursor = 'pointer';
     openButton.addEventListener('click', () => {
         allOpenRightWorldline();
-        showRightWorldlineExplanation(explanationMessage, false);
+        showRightWorldlineExplanation(WORLDLINE_CONTENT.right.explanationMessage, false);
         openButton.disabled = true;
         openButton.style.backgroundColor = '#6c757d';
         openButton.style.cursor = 'not-allowed';
@@ -562,15 +655,13 @@ function submitRightWorldlineAnswer() {
     if (!input) return;
 
     const answer = input.value;
-    if (answers.includes(answer.toLowerCase()) || answers.includes(answer)) {
+    if (isCorrectAnswer(answer, WORLDLINE_CONTENT.right.answers)) {
         alert('正解！');
         worldlineRightState.cleared = 1;
+        captureRightClearSnapshot();
         showRightWorldlineResultButtons(makeTweetFromWorldlineState(worldlineRightState));
+        checkWorldlineReunion();
         return;
-    }
-
-    if (answers.includes(answer)) {
-        answers = answers.filter(e => e !== answer);
     }
 
     worldlineRightState.remainingAttempts--;
@@ -579,7 +670,7 @@ function submitRightWorldlineAnswer() {
     }
 
     if (worldlineRightState.revealed == 25) {
-        alert('ちがいます。' + hintMessage);
+        alert('ちがいます。' + WORLDLINE_CONTENT.right.hintMessage);
     } else {
         alert(`ちがいます`);
     }
@@ -653,7 +744,7 @@ function buildWorldlineClone() {
     return true;
 }
 
-function setWorldlinePosition(progress) {
+function setWorldlinePosition(progress, forceOverlay = false) {
     const sourceRoot = document.getElementById('worldlineRoot');
     const cloneContainer = document.getElementById('worldlineClone');
     const stage = document.getElementById('worldlineStage');
@@ -680,9 +771,9 @@ function setWorldlinePosition(progress) {
     sourceRoot.style.transform = `translate3d(${sourceX}px, ${sourceY}px, 0)`;
     cloneContainer.style.transform = `translate3d(${cloneX}px, ${cloneY}px, 0)`;
 
-    const isSplitting = progress < 1;
-    sourceRoot.style.opacity = isSplitting ? WORLDLINE_OVERLAY_OPACITY : '1';
-    cloneContainer.style.opacity = isSplitting ? WORLDLINE_OVERLAY_OPACITY : '1';
+    const shouldOverlay = forceOverlay || progress < 1;
+    sourceRoot.style.opacity = shouldOverlay ? WORLDLINE_OVERLAY_OPACITY : '1';
+    cloneContainer.style.opacity = shouldOverlay ? WORLDLINE_OVERLAY_OPACITY : '1';
 }
 
 function animateWorldlineSplit() {
@@ -716,8 +807,121 @@ function animateWorldlineSplit() {
     worldlineAnimationFrame = requestAnimationFrame(step);
 }
 
-function triggerWorldlineSplit() {
-    if (worldlineTriggered || cleared != 0) return;
+function hideIndividualWorldlineResults() {
+    const leftResults = document.getElementById('result-buttons');
+    if (leftResults) {
+        leftResults.style.display = 'none';
+    }
+    if (worldlineRightState.resultContainer) {
+        worldlineRightState.resultContainer.style.display = 'none';
+    }
+}
+
+function showMergedWorldlineResultButton() {
+    if (mergedResultContainer) return;
+
+    const container = document.getElementById('canvas-container');
+    if (!container) return;
+
+    const buttonContainer = document.createElement('div');
+    buttonContainer.id = 'merged-result-buttons';
+    buttonContainer.style.display = 'flex';
+    buttonContainer.style.justifyContent = 'center';
+    buttonContainer.style.gap = '20px';
+    buttonContainer.style.marginTop = '20px';
+
+    const shareButton = document.createElement('button');
+    shareButton.textContent = 'Xで共有';
+    shareButton.style.padding = '10px 20px';
+    shareButton.style.fontSize = '16px';
+    shareButton.style.color = '#fff';
+    shareButton.style.backgroundColor = '#007bff';
+    shareButton.style.border = 'none';
+    shareButton.style.borderRadius = '5px';
+    shareButton.style.cursor = 'pointer';
+    shareButton.addEventListener('click', () => {
+        const tweetText = makeMergedWorldlineTweet();
+        const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+        window.open(tweetUrl, '_blank');
+    });
+
+    const openButton = document.createElement('button');
+    openButton.textContent = '全部開ける';
+    openButton.style.padding = '10px 20px';
+    openButton.style.fontSize = '16px';
+    openButton.style.color = '#fff';
+    openButton.style.backgroundColor = '#28a745';
+    openButton.style.border = 'none';
+    openButton.style.borderRadius = '5px';
+    openButton.style.cursor = 'pointer';
+    openButton.addEventListener('click', () => {
+        allOpen();
+        allOpenRightWorldline();
+        showExplanationMessageOnScreen(
+            `左の世界線:\n${WORLDLINE_CONTENT.left.explanationMessage}\n\n右の世界線:\n${WORLDLINE_CONTENT.right.explanationMessage}`,
+            false
+        );
+        openButton.disabled = true;
+        openButton.style.backgroundColor = '#6c757d';
+        openButton.style.cursor = 'not-allowed';
+    });
+
+    buttonContainer.appendChild(shareButton);
+    buttonContainer.appendChild(openButton);
+    container.appendChild(buttonContainer);
+    mergedResultContainer = buttonContainer;
+}
+
+function triggerWorldlineReunion() {
+    if (worldlineReunionTriggered || !worldlineTriggered) return;
+
+    worldlineReunionTriggered = true;
+    hideIndividualWorldlineResults();
+
+    if (worldlineDarkFadeFrame) {
+        cancelAnimationFrame(worldlineDarkFadeFrame);
+        worldlineDarkFadeFrame = null;
+    }
+
+    worldlineDarkOverlayAlpha = WORLDLINE_DARK_OVERLAY_ALPHA;
+    document.body.classList.add('worldline-dim');
+    document.body.classList.add('worldline-reuniting');
+    document.body.classList.remove('worldline-settled');
+    document.body.style.setProperty('--worldline-page-darkness', '1');
+
+    const startTime = performance.now();
+    const step = (now) => {
+        const progress = Math.min((now - startTime) / WORLDLINE_REUNION_MS, 1);
+        const eased = easeWorldlineSplit(progress);
+        setWorldlinePosition(1 - eased, true);
+        drawArea();
+        drawRightWorldlineCanvas();
+
+        if (progress < 1) {
+            worldlineAnimationFrame = requestAnimationFrame(step);
+            return;
+        }
+
+        document.body.classList.remove('worldline-reuniting');
+        document.body.classList.add('worldline-settled');
+        document.body.classList.add('worldline-merged');
+        setWorldlinePosition(0, true);
+        worldlineAnimationFrame = null;
+        showMergedWorldlineResultButton();
+        fadeOutWorldlineDarkness();
+    };
+
+    worldlineAnimationFrame = requestAnimationFrame(step);
+}
+
+function checkWorldlineReunion() {
+    if (cleared == 1 && worldlineRightState.cleared == 1) {
+        triggerWorldlineReunion();
+    }
+}
+
+function triggerWorldlineSplit(options = {}) {
+    if (worldlineTriggered || (cleared != 0 && !options.allowCleared)) return;
 
     worldlineTriggered = true;
     worldlineDarkOverlayAlpha = WORLDLINE_DARK_OVERLAY_ALPHA;
@@ -728,6 +932,9 @@ function triggerWorldlineSplit() {
 
     requestAnimationFrame(() => {
         if (!buildWorldlineClone()) return;
+        if (typeof options.afterClone === 'function') {
+            options.afterClone();
+        }
         animateWorldlineSplit();
     });
 }
@@ -948,7 +1155,7 @@ function mouseReleased() {
             drawArea();
             revealed++;
 
-            if (index === WORLDLINE_PANEL_INDEX) {
+            if (WORLDLINE_PANEL_INDICES.includes(index)) {
                 triggerWorldlineSplit();
             }
         }
@@ -962,24 +1169,46 @@ const submitButton = document.getElementById('submitAnswer');
 if (submitButton) {
     submitButton.addEventListener('click', () => {
         const answerInput = document.getElementById('answerInput').value;
-        if (answers.includes(answerInput.toLowerCase())) {
+        if (isCorrectAnswer(answerInput, WORLDLINE_CONTENT.left.answers)) {
             alert('正解！');
 
             tweetMess = make_tweet();
 
             cleared = 1;
+            captureLeftClearSnapshot();
 
-            showResultButtons(tweetMess);
-        } else {
-            if (answers.includes(answerInput)) {
-                answers = answers.filter(e => e !== answerInput);
+            if (!worldlineTriggered) {
+                triggerWorldlineSplit({
+                    allowCleared: true,
+                    afterClone: () => {
+                        showResultButtons(tweetMess);
+                        checkWorldlineReunion();
+                    }
+                });
+            } else {
+                showResultButtons(tweetMess);
+                checkWorldlineReunion();
             }
-
+        } else if (!worldlineTriggered && isCorrectAnswer(answerInput, WORLDLINE_CONTENT.right.answers)) {
+            alert('正解！');
+            triggerWorldlineSplit({
+                afterClone: () => {
+                    const leftInput = document.getElementById('answerInput');
+                    if (leftInput) {
+                        leftInput.value = '';
+                    }
+                    worldlineRightState.cleared = 1;
+                    captureRightClearSnapshot();
+                    showRightWorldlineResultButtons(makeTweetFromWorldlineState(worldlineRightState));
+                    checkWorldlineReunion();
+                }
+            });
+        } else {
             remainingAttempts--;
             document.getElementById('remainingAttempts').textContent = `残り解答回数: ${remainingAttempts}`;
 
             if (revealed == 25){
-                alert('ちがいます。' + hintMessage);
+                alert('ちがいます。' + WORLDLINE_CONTENT.left.hintMessage);
             }else{
                 alert(`ちがいます`);
             }
@@ -1032,7 +1261,7 @@ function showResultButtons(tweetMess) {
     customButton.style.cursor = 'pointer';
     customButton.addEventListener('click', () => {
         allOpen();
-        showExplanationMessageOnScreen(explanationMessage, false);
+        showExplanationMessageOnScreen(WORLDLINE_CONTENT.left.explanationMessage, false);
         customButton.disabled = true;
         customButton.style.backgroundColor = '#6c757d';
         customButton.style.cursor = 'not-allowed';

@@ -103,6 +103,21 @@
             pointer-events: auto;
         }
 
+        body.worldline-merged #worldlineClone,
+        body.worldline-merged #worldlineClone canvas,
+        body.worldline-merged #worldlineClone input,
+        body.worldline-merged #worldlineClone button,
+        body.worldline-merged #worldlineClone a,
+        body.worldline-merged #worldlineClone [role="button"] {
+            pointer-events: none;
+        }
+
+        body.worldline-merged #worldlineClone .quiz-container,
+        body.worldline-merged #worldlineClone .back-to-top-footer,
+        body.worldline-merged #worldlineClone [data-worldline-canvas-container] {
+            display: none !important;
+        }
+
         body.worldline-dim .quiz-info,
         body.worldline-dim .back-to-top-link {
             color: #e8ecff;
@@ -116,7 +131,9 @@
         }
 
         body.worldline-splitting #worldlineRoot,
-        body.worldline-splitting #worldlineClone {
+        body.worldline-splitting #worldlineClone,
+        body.worldline-reuniting #worldlineRoot,
+        body.worldline-reuniting #worldlineClone {
             filter: saturate(1.15) contrast(1.08);
             mix-blend-mode: screen;
         }
