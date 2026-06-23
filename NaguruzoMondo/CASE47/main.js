@@ -17,7 +17,7 @@ let tweetMess = "NaguruzoMondoに挑戦中！";
 
 let answers = ["だいどうしょうい","大同小異"];
 let hintMessage = "";
-let explanationMessage = "リアルタイム版ではCASE40は一人一マスしか開けない制約のもとで、共有した盤面上で全員で協力して答えを導き出す形式でした。";
+let explanationMessage = "特にありません";
 
 let remainingAttempts = 3;
 
