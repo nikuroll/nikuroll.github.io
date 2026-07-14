@@ -174,14 +174,16 @@ function cellAt(x, y) {
 }
 
 function mousePressed() {
-    if (mouseButton === RIGHT || cleared !== 0) return false;
+    if (mouseButton === RIGHT) return false;
+    if (cleared !== 0) return;
     pressedCell = cellAt(mouseX, mouseY);
     if (pressedCell >= 0) redraw();
     return false;
 }
 
 function mouseReleased() {
-    if (mouseButton === RIGHT || cleared !== 0) return false;
+    if (mouseButton === RIGHT) return false;
+    if (cleared !== 0) return;
     const releasedCell = cellAt(mouseX, mouseY);
     if (pressedCell >= 0 && releasedCell === pressedCell) {
         clicked[pressedCell] = !clicked[pressedCell];
