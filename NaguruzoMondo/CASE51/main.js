@@ -168,13 +168,13 @@ function submitAnswer() {
     if (!answer) return;
 
     if (phase === "waiting" && START_ANSWERS.includes(answer)) {
-        alert("正解！");
+        alert("正解！（音が出ます）");
         startZoom();
         return;
     }
 
     if (FINAL_ANSWERS.includes(answer)) {
-        if (phase === "waiting" && remainingAttempts === 3) {
+        if (phase === "waiting") {
             bonusPoints = 10000;
         }
         if (phase === "zooming" || phase === "replay") {
