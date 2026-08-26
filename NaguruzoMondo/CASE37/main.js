@@ -306,7 +306,7 @@ if (submitButton) {
     submitButton.addEventListener('click', () => {
         const answerInput = document.getElementById('answerInput').value;
         if (answers1.includes(answerInput)) {
-            alert('正解！');
+            window.showCaseMessage('正解！');
 
             tweetMess = make_tweet();
 
@@ -314,7 +314,7 @@ if (submitButton) {
 
             showResultButtons(tweetMess);
         } else if (answers2.includes(answerInput)) {
-            alert('ｾｲｶｧｲ');
+            window.showCaseMessage('ｾｲｶｧｲ');
 
             tweetMess = make_tweet();
 
@@ -322,7 +322,7 @@ if (submitButton) {
 
             showResultButtons(tweetMess);
         } else if (answers3.includes(answerInput)) {
-            alert('真の正解！');
+            window.showCaseMessage('真の正解！');
 
             tweetMess = make_tweet(res=1);
 
@@ -334,9 +334,9 @@ if (submitButton) {
             document.getElementById('remainingAttempts').textContent = `残り解答回数: ${remainingAttempts}`;
             
             if (revealed == 25){
-                alert('ちがいます。' + hintMessage);
+                window.showCaseMessage('ちがいます。' + hintMessage);
             }else{
-                alert(`ちがいます`);
+                window.showCaseMessage(`ちがいます`);
             }
 
             actionLog.push(-1);

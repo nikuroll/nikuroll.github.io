@@ -217,7 +217,7 @@ if (submitButton) {
     submitButton.addEventListener('click', () => {
         const answerInput = document.getElementById('answerInput').value;
         if (answerInput == "すみれ") {
-            alert('正解！');
+            window.showCaseMessage('正解！');
 
             tweetMess = make_tweet();
 
@@ -275,7 +275,7 @@ if (submitButton) {
             const container = document.getElementById('canvas-container');
             container.appendChild(buttonContainer);
         }else{
-            alert(`ちがいます`);
+            window.showCaseMessage(`ちがいます`);
         }
     });
 }

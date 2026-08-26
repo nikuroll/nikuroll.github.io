@@ -512,11 +512,11 @@ if (submitButton) {
         const answerInput = document.getElementById('answerInput').value;
         if (answers.includes(answerInput)) {
             if (answerInput.length > 3){
-                alert("やるやん");
+                window.showCaseMessage("やるやん");
                 tweetMess = make_tweet(res=1);
                 showResultButtons(tweetMess);
             }else{
-                alert('正解！');
+                window.showCaseMessage('正解！');
                 tweetMess = make_tweet();
                 showResultButtons(tweetMess);
             }
@@ -535,9 +535,9 @@ if (submitButton) {
             document.getElementById('remainingAttempts').textContent = `残り解答回数: ${remainingAttempts}`;
 
             if (revealed == 25){
-                alert(`ちがいます。\n` + HINT);
+                window.showCaseMessage(`ちがいます。\n` + HINT);
             }else{
-                alert(`ちがいます`);
+                window.showCaseMessage(`ちがいます`);
             }
 
             actionLog.push(-1);

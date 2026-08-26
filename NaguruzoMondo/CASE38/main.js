@@ -214,7 +214,7 @@ if (submitButton) {
     submitButton.addEventListener('click', () => {
         const answerInput = document.getElementById('answerInput').value.trim().toLowerCase();
         if (answers.includes(answerInput)) {
-            alert('正解！');
+            window.showCaseMessage('正解！');
 
             tweetMess = make_tweet();
 
@@ -230,9 +230,9 @@ if (submitButton) {
             document.getElementById('remainingAttempts').textContent = `残り解答回数: ${remainingAttempts}`;
             
             if (revealed == 25){
-                alert(hintMessage);
+                window.showCaseMessage(hintMessage);
             }else{
-                alert(`ちがいます`);
+                window.showCaseMessage(`ちがいます`);
             }
 
             actionLog.push(-1);

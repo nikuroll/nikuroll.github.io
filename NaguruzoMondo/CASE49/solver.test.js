@@ -75,6 +75,9 @@ test("production page keeps the standard minimal CASE layout", () => {
 
     const productionMain = fs.readFileSync(path.join(__dirname, "main.js"), "utf8");
     assert.doesNotMatch(productionMain, /URLSearchParams|searchParams|\?ac=/);
+    assert.doesNotMatch(productionMain, /if \(pressedCell >= 0\) redraw\(\);\s*return false;/);
+    assert.doesNotMatch(productionMain, /pressedCell = -1;\s*redraw\(\);\s*}\s*return false;/);
+    assert.match(productionMain, /if \(mouseButton === RIGHT\) return false;/);
 
     assert.match(testHtml, /CASE49 TEST/);
     assert.match(testHtml, /expectedBoardDetails/);

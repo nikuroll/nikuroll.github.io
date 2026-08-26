@@ -165,6 +165,53 @@ button:hover {
     transform: scale(1.05);
 }
 
+.case-message-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483647;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+    background: rgba(0, 0, 0, 0.55);
+}
+
+.case-message-overlay[hidden] {
+    display: none;
+}
+
+.case-message-dialog {
+    width: min(420px, 100%);
+    max-height: min(80vh, 560px);
+    overflow-y: auto;
+    box-sizing: border-box;
+    padding: 24px;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+.case-message-text {
+    margin: 0 0 22px;
+    color: #222;
+    font-size: 18px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.case-message-close {
+    min-width: 100px;
+    touch-action: manipulation;
+}
+
+.case-message-close:focus-visible {
+    outline: 3px solid #ffb347;
+    outline-offset: 3px;
+}
+
 @media (max-width: 600px) {
     body {
         padding: 20px;

@@ -160,7 +160,7 @@ function normalizeAnswer(value) {
         .toLowerCase();
 }
 
-function submitAnswer() {
+async function submitAnswer() {
     if (phase === "cleared") return;
 
     const answerElement = document.getElementById("answerInput");
@@ -168,7 +168,7 @@ function submitAnswer() {
     if (!answer) return;
 
     if (phase === "waiting" && START_ANSWERS.includes(answer)) {
-        alert("正解！（音が出ます）");
+        await window.showCaseMessage("正解！（音が出ます）");
         startZoom();
         return;
     }
@@ -180,7 +180,7 @@ function submitAnswer() {
         if (phase === "zooming" || phase === "replay") {
             updateZoom(performance.now());
         }
-        completePuzzle();
+        await completePuzzle();
         return;
     }
 
@@ -233,10 +233,10 @@ function registerWrongAnswer() {
     document.getElementById("remainingAttempts").textContent =
         `残り解答回数: ${remainingAttempts}`;
 
-    alert("ちがいます");
+    window.showCaseMessage("ちがいます");
 }
 
-function completePuzzle() {
+async function completePuzzle() {
     clearedScore = calculateVisiblePercent();
     clearedClicked = clicked.slice();
     pausedZoomElapsedMs = zoomElapsedMs;
@@ -246,7 +246,7 @@ function completePuzzle() {
 
     const scoreText = formatPercent(clearedScore);
     const bonusText = bonusPoints > 0 ? `\nボーナス: +${bonusPoints}点` : "";
-    alert(`正解！\n見えていた面積: ${scoreText}%${bonusText}`);
+    await window.showCaseMessage(`正解！\n見えていた面積: ${scoreText}%${bonusText}`);
 
     document.querySelector(".quiz-container").style.display = "none";
     showResultButtons();

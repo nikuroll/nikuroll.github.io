@@ -926,7 +926,7 @@ function failCase(message) {
     triggerWrongAnswerFloorJump();
     showResultButtons(make_tweet(1));
     setTimeout(() => {
-        alert(message);
+        window.showCaseMessage(message);
     }, 100);
 }
 
@@ -941,7 +941,7 @@ function completeGoal() {
     setStatusMessage(successMessages.goal);
     showResultButtons(tweetMess);
     setTimeout(() => {
-        alert(successMessages.goal);
+        window.showCaseMessage(successMessages.goal);
     }, 100);
 }
 
@@ -1297,7 +1297,7 @@ function triggerWrongAnswerFloorJump() {
     }
 }
 
-function handleSubmitAnswer() {
+async function handleSubmitAnswer() {
     const answerInput = document.getElementById('answerInput');
     if (!answerInput) {
         return;
@@ -1309,7 +1309,7 @@ function handleSubmitAnswer() {
     }
 
     if (answers.includes(userAnswer)) {
-        alert('正解！');
+        await window.showCaseMessage('正解！');
         tweetMess = make_tweet();
         cleared = 1;
         showResultButtons(tweetMess);
@@ -1322,7 +1322,7 @@ function handleSubmitAnswer() {
         remainingAttemptsLabel.textContent = `残り解答回数: ${remainingAttempts}`;
     }
 
-    alert(revealed === grid * grid ? `ちがいます。${hintMessage}` : 'ちがいます');
+    await window.showCaseMessage(revealed === grid * grid ? `ちがいます。${hintMessage}` : 'ちがいます');
     triggerWrongAnswerFloorJump();
     actionLog.push(-1);
 }

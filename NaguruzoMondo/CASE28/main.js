@@ -294,9 +294,9 @@ function mouseReleased() {
         // 開けられる日付かチェック
         if (!canOpenPanel(panelNum)) {
             if (currentDate > 25) {
-                alert(`開封期間が終了しました`);
+                window.showCaseMessage(`開封期間が終了しました`);
             } else {
-                alert(`まだ開けられません`);
+                window.showCaseMessage(`まだ開けられません`);
             }
             drawArea();
             return;
@@ -320,7 +320,7 @@ if (submitButton) {
         const answerInput = document.getElementById('answerInput').value.trim();
         
         if (answers.includes(answerInput)) {
-            alert('正解！');
+            window.showCaseMessage('正解！');
 
             tweetMess = make_tweet();
             cleared = 1;
@@ -330,7 +330,7 @@ if (submitButton) {
             remainingAttempts--;
             document.getElementById('remainingAttempts').textContent = `残り解答回数: ${remainingAttempts}`;
             
-            alert(`ちがいます`);
+            window.showCaseMessage(`ちがいます`);
         }
     });
 }
@@ -531,7 +531,7 @@ function initDebugPanel() {
     document.getElementById('debug-show-cookie').addEventListener('click', () => {
         const cookieData = loadProgress();
         const cookieStr = document.cookie.split('; ').find(row => row.startsWith('case28_advent='));
-        alert(`Cookie内容:\n${cookieStr || '(なし)'}\n\n開封済みパネル: ${JSON.stringify(cookieData)}`);
+        window.showCaseMessage(`Cookie内容:\n${cookieStr || '(なし)'}\n\n開封済みパネル: ${JSON.stringify(cookieData)}`);
         console.log('[DEBUG] Cookie:', cookieStr, '\nデータ:', cookieData);
     });
     

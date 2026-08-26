@@ -229,7 +229,7 @@ function mouseReleased() {
                 tweetMess = make_tweet(res = 1);
                 showResultButtons(tweetMess);
                 setTimeout(() => {
-                    alert('あなたは降参しました。');
+                    window.showCaseMessage('あなたは降参しました。');
                 }, 100);
                 cleared = 1;
                 pressedCell = null;
@@ -254,7 +254,7 @@ if (submitButton) {
     submitButton.addEventListener('click', () => {
         const answerInput = document.getElementById('answerInput').value;
         if (answers.includes(answerInput)){
-            alert('正解！');
+            window.showCaseMessage('正解！');
 
             tweetMess = make_tweet();
 
@@ -269,7 +269,7 @@ if (submitButton) {
             remainingAttempts--;
             document.getElementById('remainingAttempts').textContent = `残り解答回数: ${remainingAttempts}`;
 
-            alert(`ちがいます`);
+            window.showCaseMessage(`ちがいます`);
 
             actionLog.push(-1);
         }

@@ -43,7 +43,7 @@ function recompute() {
         cleared = 1;
         const tweetText = makeTweetText();
         window.setTimeout(() => {
-            alert("正解！");
+            window.showCaseMessage("正解！");
             showResultButtons(tweetText);
         }, 0);
     }
@@ -178,7 +178,6 @@ function mousePressed() {
     if (cleared !== 0) return;
     pressedCell = cellAt(mouseX, mouseY);
     if (pressedCell >= 0) redraw();
-    return false;
 }
 
 function mouseReleased() {
@@ -193,7 +192,6 @@ function mouseReleased() {
         pressedCell = -1;
         redraw();
     }
-    return false;
 }
 
 function makeTweetText() {

@@ -230,7 +230,7 @@ if (submitButton) {
             remainingAttempts--;
             document.getElementById('remainingAttempts').textContent = `残り解答回数: ${remainingAttempts}`;
 
-            alert(`ちがいます`);
+            window.showCaseMessage(`ちがいます`);
 
             actionLog.push(-1);
         }

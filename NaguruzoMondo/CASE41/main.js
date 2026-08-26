@@ -791,7 +791,7 @@ function triggerWrongAnswerFloorJump() {
     }
 }
 
-function handleSubmitAnswer() {
+async function handleSubmitAnswer() {
     const answerInput = document.getElementById('answerInput');
     if (!answerInput) {
         return;
@@ -803,7 +803,7 @@ function handleSubmitAnswer() {
     }
 
     if (answers.includes(userAnswer)) {
-        alert('正解！');
+        await window.showCaseMessage('正解！');
         tweetMess = make_tweet();
         cleared = 1;
         showResultButtons(tweetMess);
@@ -816,7 +816,7 @@ function handleSubmitAnswer() {
         remainingAttemptsLabel.textContent = `残り解答回数: ${remainingAttempts}`;
     }
 
-    alert(revealed === grid * grid ? `ちがいます。${hintMessage}` : 'ちがいます');
+    await window.showCaseMessage(revealed === grid * grid ? `ちがいます。${hintMessage}` : 'ちがいます');
     triggerWrongAnswerFloorJump();
     actionLog.push(-1);
 }

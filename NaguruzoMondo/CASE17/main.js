@@ -406,7 +406,7 @@ if (submitButton) {
     submitButton.addEventListener('click', () => {
         const answerInput = document.getElementById('answerInput').value;
         if (answers.includes(answerInput)) {
-            alert('正解！');
+            window.showCaseMessage('正解！');
 
             tweetMess = make_tweet();
 
@@ -421,7 +421,7 @@ if (submitButton) {
             remainingAttempts--;
             document.getElementById('remainingAttempts').textContent = `残り解答回数: ${remainingAttempts}`;
 
-            alert(`意味ないよ`);
+            window.showCaseMessage(`意味ないよ`);
 
             actionLog.push(-1);
         }
@@ -508,7 +508,7 @@ function drawArea() {
     blendMode(BLEND);
 
     if (cleared == 0 & checkCompletion()) {
-        alert('正解！');
+        window.showCaseMessage('正解！');
         cleared = 1;
         tweetMess = make_tweet(0);
         showResultButtons(tweetMess);

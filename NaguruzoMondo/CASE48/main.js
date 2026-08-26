@@ -514,7 +514,7 @@ if (submitButton) {
         const isCorrect = answers.some(answer => answer.toLowerCase() === normalizedAnswer);
 
         if (isCorrect) {
-            alert('正解！');
+            window.showCaseMessage('正解！');
 
             tweetMess = make_tweet();
 
@@ -526,9 +526,9 @@ if (submitButton) {
             document.getElementById('remainingAttempts').textContent = `残り解答回数: ${remainingAttempts}`;
 
             if (revealed == 25) {
-                alert('ちがいます。' + hintMessage);
+                window.showCaseMessage('ちがいます。' + hintMessage);
             } else {
-                alert('ちがいます');
+                window.showCaseMessage('ちがいます');
             }
 
             actionLog.push(-1);

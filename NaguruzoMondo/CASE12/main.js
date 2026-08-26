@@ -383,7 +383,7 @@ if (submitButton) {
     submitButton.addEventListener('click', () => {
         const answerInput = document.getElementById('answerInput').value;
         if (answerCheck(answerInput) == 0) {
-            alert('正解！');
+            window.showCaseMessage('正解！');
 
             tweetMess = make_tweet(0);
 
@@ -391,7 +391,7 @@ if (submitButton) {
 
             showResultButtons(tweetMess);
         }else if (answerCheck(answerInput) == 1) {
-            alert('完全に正解！');
+            window.showCaseMessage('完全に正解！');
 
             tweetMess = make_tweet(res=1);
 
@@ -406,7 +406,7 @@ if (submitButton) {
             remainingAttempts--;
             document.getElementById('remainingAttempts').textContent = `残り解答回数: ${remainingAttempts}`;
 
-            alert(`ちがいます`);
+            window.showCaseMessage(`ちがいます`);
 
             actionLog.push(-1);
         }

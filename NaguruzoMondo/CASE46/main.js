@@ -656,7 +656,7 @@ function submitRightWorldlineAnswer() {
 
     const answer = input.value;
     if (isCorrectAnswer(answer, WORLDLINE_CONTENT.right.answers)) {
-        alert('正解！');
+        window.showCaseMessage('正解！');
         worldlineRightState.cleared = 1;
         captureRightClearSnapshot();
         showRightWorldlineResultButtons(makeTweetFromWorldlineState(worldlineRightState));
@@ -670,9 +670,9 @@ function submitRightWorldlineAnswer() {
     }
 
     if (worldlineRightState.revealed == 25) {
-        alert('ちがいます。' + WORLDLINE_CONTENT.right.hintMessage);
+        window.showCaseMessage('ちがいます。' + WORLDLINE_CONTENT.right.hintMessage);
     } else {
-        alert(`ちがいます`);
+        window.showCaseMessage(`ちがいます`);
     }
 
     worldlineRightState.actionLog.push(-1);
@@ -1170,7 +1170,7 @@ if (submitButton) {
     submitButton.addEventListener('click', () => {
         const answerInput = document.getElementById('answerInput').value;
         if (isCorrectAnswer(answerInput, WORLDLINE_CONTENT.left.answers)) {
-            alert('正解！');
+            window.showCaseMessage('正解！');
 
             tweetMess = make_tweet();
 
@@ -1190,7 +1190,7 @@ if (submitButton) {
                 checkWorldlineReunion();
             }
         } else if (!worldlineTriggered && isCorrectAnswer(answerInput, WORLDLINE_CONTENT.right.answers)) {
-            alert('正解！');
+            window.showCaseMessage('正解！');
             triggerWorldlineSplit({
                 afterClone: () => {
                     const leftInput = document.getElementById('answerInput');
@@ -1208,9 +1208,9 @@ if (submitButton) {
             document.getElementById('remainingAttempts').textContent = `残り解答回数: ${remainingAttempts}`;
 
             if (revealed == 25){
-                alert('ちがいます。' + WORLDLINE_CONTENT.left.hintMessage);
+                window.showCaseMessage('ちがいます。' + WORLDLINE_CONTENT.left.hintMessage);
             }else{
-                alert(`ちがいます`);
+                window.showCaseMessage(`ちがいます`);
             }
 
             actionLog.push(-1);

@@ -314,7 +314,7 @@ function mouseReleased() {
                 fishPositions[caughtFishIndex].caught = true;
                 
                 // 正解判定
-                alert('金魚を見つけた！');
+                window.showCaseMessage('金魚を見つけた！');
 
                 tweetMess = make_tweet();
 
@@ -322,7 +322,7 @@ function mouseReleased() {
 
                 showResultButtons(tweetMess);
             }else if(revealed == grid * grid){
-                alert('金魚をすくえなかった...');
+                window.showCaseMessage('金魚をすくえなかった...');
                 tweetMess = make_tweet();
                 cleared = 1;
                 showResultButtons(tweetMess);
@@ -339,7 +339,7 @@ if (submitButton) {
     submitButton.addEventListener('click', () => {
         const answerInput = document.getElementById('answerInput').value;
         if (answers.includes(answerInput)) {
-            alert('正解！');
+            window.showCaseMessage('正解！');
 
             tweetMess = make_tweet();
 
@@ -354,7 +354,7 @@ if (submitButton) {
             remainingAttempts--;
             document.getElementById('remainingAttempts').textContent = `残り解答回数: ${remainingAttempts}`;
 
-            alert(`意味ないよ`);
+            window.showCaseMessage(`意味ないよ`);
 
             actionLog.push(-1);
         }
