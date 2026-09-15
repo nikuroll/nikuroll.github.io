@@ -1,0 +1,14 @@
+# CASE53
+
+CASE47をコピー元にした標準5x5パネル・一枚謎。最後の1枚の特殊画像処理は削除。
+今回の明示依頼により、キャッチコピーと操作ごとの短いポエムを多めに配置。
+各ポエムは読点「、」と句点「。」を1つずつ使う。他CASEのUI方針には適用しない。
+
+## 問題の差し替え
+
+- `images/pic(26).PNG`: 一枚の問題画像。現在はCASE47からの仮置き。
+- `main.js` 冒頭の `answers`: 正解として受理する表記の配列。現在はCASE47の仮の答え。
+- `main.js` 冒頭の `hintMessage` / `explanationMessage`: 必要に応じてヒントと解説を設定。
+- 表紙・操作説明は `index.html`、正誤メッセージ・結果ボタン・解説の説明は `main.js`。
+
+旧燃焼版はstash `archive current CASE53 before rebuild 2026-09-15` に退避済み。
