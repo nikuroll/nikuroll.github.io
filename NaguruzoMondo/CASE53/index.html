@@ -6,35 +6,43 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.8.0/p5.js"></script>
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="case.css">
-    <title>CASE53 | Naguruzo Mondo</title>
+    <title>Naguruzo Mondo</title>
 </head>
 <body>
     <script src="../message-dialog.js"></script>
     <header class="case-header">
         <div class="case-number">CASE53</div>
+        <p class="poem eyebrow">一枚の謎と、向き合う時間。</p>
         <h1>開いて、解いて。</h1>
         <p class="poem">小さな一枚が、大きな扉になる。</p>
         <p class="poem">まだ見ぬ答えに、あなたのひらめきを。</p>
     </header>
     <main>
         <p class="poem board-caption">気になる数字から、景色をひらく。</p>
+        <aside class="board-voice">
+            <span class="voice-label">謎から、あなたへ。</span>
+            <p class="poem" id="board-whisper" role="status">最初の一枚を、待っています。</p>
+        </aside>
         <div id="canvas"></div>
         <p class="poem board-caption">残した余白に、直感が宿る。</p>
         <div id="canvas-container"></div>
+        <div class="poem interlude">見えたものから、見えない答えへ。</div>
         <div class="quiz-container">
             <div id="remainingAttempts" class="quiz-info">残り解答回数: 3</div>
             <p class="poem">一度の挑戦に、ひとつの願いを。</p>
             <label for="answerInput">解答</label>
             <p class="poem" id="answer-caption">浮かんだ言葉を、そっとここへ。</p>
-            <input type="text" id="answerInput" class="quiz-input" placeholder="解答を入力" aria-describedby="answer-caption">
-            <button id="submitAnswer" class="quiz-button" aria-describedby="submit-caption">決定</button>
+            <input type="text" id="answerInput" class="quiz-input" placeholder="解答をひらがなで、ここに入力。" aria-describedby="answer-caption">
+            <p class="poem input-whisper" id="input-whisper" aria-live="polite">言葉になる前も、ひらめきの途中。</p>
+            <button id="submitAnswer" class="quiz-button" aria-describedby="submit-caption">答えを、決定。</button>
             <p class="poem" id="submit-caption">その確信で、扉をたたく。</p>
         </div>
     </main>
     <footer class="back-to-top-footer">
         <p class="poem">解けた時間も、あなたの物語。</p>
-        <a href="../index.html" class="back-to-top-link">一覧に戻る</a>
+        <a href="../index.html" class="back-to-top-link">一覧に、戻る。</a>
         <p class="poem">次の出会いへ、歩きだそう。</p>
+        <p class="poem closing-note">ページを閉じても、問いは心に。</p>
     </footer>
     <script src="main.js"></script>
 </body>

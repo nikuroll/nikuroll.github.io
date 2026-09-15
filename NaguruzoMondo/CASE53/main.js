@@ -61,6 +61,64 @@ function calcNewImage(index) {
     return 0;
 }
 
+const whisperLines = {
+    start: ['最初の一枚を、待っています。', '今日の直感に、席をひとつ。', 'まだ白い時間に、好奇心をひとさじ。', '小さな予感と、目を合わせて。'],
+    first: ['ひとつの発見が、次の扉をひらく。', 'はじめの一歩に、景色が応える。', 'その指先から、物語が動きだす。', '小さな窓にも、大きな予感。'],
+    early: ['見えたかけらに、想像を添えて。', '気になるところが、あなたの入口。', 'ひらめきの種に、光が差してきた。', '遠くの答えへ、小さな寄り道。', 'その違和感を、ポケットに。', '余白の向こうで、何かが待っている。'],
+    middle: ['点と点が、言葉になってゆく。', 'ばらばらの景色に、一本の糸を。', '見慣れた形も、角度を変えて。', '考える時間に、深呼吸をひとつ。', '気づきの足音が、少し近づいた。', 'まだ言えない予感を、大切に。'],
+    late: ['見えてきた世界を、もうひと眺め。', '残る余白にも、物語がある。', 'ここまでの直感を、そっと並べて。', '答えの輪郭に、あなたの言葉を。', '最後の景色へ、好奇心のままに。', 'たくさんの発見が、ひとつになる前に。'],
+    full: ['すべての景色が、あなたの味方。', '一枚の世界と、ゆっくり向き合う。', '見渡した先に、新しい見方を。', '隠れたものはなくても、驚きは残っている。'],
+    clear: ['見つけてくれて、ありがとう。', '今日のひらめきに、花束を。', 'あなたが開いた扉に、光が差す。', 'ひとつの謎が、思い出になった。', 'その瞬間を、心のしおりに。', '答えに出会えた今日を、少し好きになる。'],
+    idle: ['言葉になる前も、ひらめきの途中。', '空っぽの欄にも、可能性はいっぱい。', '答えの居場所を、あけておきました。', 'まだ名前のない予感と、ひと休み。'],
+    focus: ['急がなくていい、ひらめきはあなたのもの。', '心に浮かんだ声を、聞いてみよう。', '言葉の入口で、肩の力を抜いて。', '小さな確信を、迎える準備。'],
+    writing: ['その言葉に、勇気を添えて。', '指先のリズムが、予感をつづる。', '思いついた今を、逃さないで。', 'あなたの言葉が、答えを探している。', 'ひと文字ずつに、直感を込めて。', 'その候補にも、出会った理由がある。'],
+    retry: ['遠回りも、答えへの道になる。', '別の角度から、もう一度。', 'ひとつ試した分だけ、景色は変わる。', '迷った足跡も、あなたの地図。', '思い込みの窓を、少し開けて。', '考え直す時間に、やさしい余白を。'],
+    wrong: ['迷いの先に、ひらめきはある。', '答えはまだ、かくれんぼの途中。', 'その挑戦にも、小さな拍手を。', '違ったからこそ、見えるものがある。', 'ひと息ついたら、別の道へ。', '次の予感が、出番を待っている。']
+};
+
+// 場面ごとに全候補を使い切ってから補充し、直前の文も避ける。
+const whisperBags = new Map();
+const lastWhispers = new Map();
+function pickWhisper(scene) {
+    let bag = whisperBags.get(scene);
+    if (!bag || bag.length === 0) {
+        bag = [...whisperLines[scene]];
+        whisperBags.set(scene, bag);
+    }
+    const choices = bag.filter(line => line !== lastWhispers.get(scene));
+    const line = choices[Math.floor(Math.random() * choices.length)];
+    bag.splice(bag.indexOf(line), 1);
+    lastWhispers.set(scene, line);
+    return line;
+}
+
+function updateBoardWhisper() {
+    const whisper = document.getElementById('board-whisper');
+    if (!whisper) return;
+    const scene = cleared ? 'clear' : revealed === 25 ? 'full'
+        : revealed >= 20 ? 'late' : revealed >= 10 ? 'middle'
+        : revealed >= 2 ? 'early' : revealed === 1 ? 'first' : 'start';
+    whisper.textContent = pickWhisper(scene);
+}
+updateBoardWhisper();
+
+const poeticInput = document.getElementById('answerInput');
+if (poeticInput) {
+    let previousScene = '';
+    const updateInputWhisper = (event) => {
+        if (event?.isComposing) return;
+        const scene = poeticInput.value.length ? 'writing'
+            : document.activeElement === poeticInput ? 'focus' : 'idle';
+        if (scene === previousScene && event?.type !== 'focus') return;
+        previousScene = scene;
+        document.getElementById('input-whisper').textContent = pickWhisper(scene);
+    };
+    for (const event of ['focus', 'input', 'blur', 'compositionend']) {
+        poeticInput.addEventListener(event, updateInputWhisper);
+    }
+    updateInputWhisper();
+}
+
 function windowResized() {
     const size = min(window.innerWidth - 32, window.innerHeight, 800);
     resizeCanvas(size, size);
@@ -161,6 +219,7 @@ function allOpen() {
         }
     }
     drawArea();
+    updateBoardWhisper();
 }
 
 function showExplanationMessageOnScreen(message, open = false) {
@@ -300,6 +359,7 @@ function mouseReleased() {
             showidx[index] = newpic;
             drawArea();
             revealed++;
+            updateBoardWhisper();
         }
     }
     
@@ -312,11 +372,12 @@ if (submitButton) {
     submitButton.addEventListener('click', () => {
         const answerInput = document.getElementById('answerInput').value;
         if (answers.includes(answerInput.toLowerCase())) {
-            window.showCaseMessage('正解！\n扉の向こうで、ひらめきが微笑む。');
+            window.showCaseMessage('正解！\n' + pickWhisper('clear'));
 
             tweetMess = make_tweet();
 
             cleared = 1;
+            updateBoardWhisper();
 
             showResultButtons(tweetMess);
         } else {
@@ -328,12 +389,13 @@ if (submitButton) {
             document.getElementById('remainingAttempts').textContent = `残り解答回数: ${remainingAttempts}`;
             
             if (revealed == 25){
-                window.showCaseMessage('ちがいます。\n迷いの先に、ひらめきはある。' + hintMessage);
+                window.showCaseMessage('ちがいます。\n' + pickWhisper('wrong') + '\n' + hintMessage);
             }else{
-                window.showCaseMessage('ちがいます。\n迷いの先に、ひらめきはある。');
+                window.showCaseMessage('ちがいます。\n' + pickWhisper('wrong'));
             }
 
             actionLog.push(-1);
+            document.getElementById('input-whisper').textContent = pickWhisper('retry');
         }
     });
 }
@@ -358,7 +420,7 @@ function showResultButtons(tweetMess) {
     buttonContainer.style.marginTop = '20px';
 
     const shareButton = document.createElement('button');
-    shareButton.textContent = 'Xで共有';
+    shareButton.textContent = 'Xで、共有する。';
     shareButton.style.padding = '10px 20px';
     shareButton.style.fontSize = '16px';
     shareButton.style.color = '#fff';
@@ -371,7 +433,7 @@ function showResultButtons(tweetMess) {
     });
 
     const customButton = document.createElement('button');
-    customButton.textContent = '全部開ける';
+    customButton.textContent = '全部を、開ける。';
     customButton.style.padding = '10px 20px';
     customButton.style.fontSize = '16px';
     customButton.style.color = '#fff';
@@ -400,5 +462,14 @@ function showResultButtons(tweetMess) {
     }
 
     const container = document.getElementById('canvas-container');
+    const intro = document.createElement('section');
+    intro.className = 'result-intro';
+    const heading = document.createElement('h2');
+    heading.textContent = 'ひらめきに、拍手を。';
+    const afterword = document.createElement('p');
+    afterword.className = 'poem';
+    afterword.textContent = 'あなたの一歩が、謎を物語に変えた。';
+    intro.append(heading, afterword);
+    container.prepend(intro);
     container.appendChild(buttonContainer);
 }

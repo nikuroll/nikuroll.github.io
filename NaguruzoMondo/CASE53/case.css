@@ -14,3 +14,12 @@ body { padding: 24px 16px; box-sizing: border-box; }
 button, .back-to-top-link { min-height: 44px; box-sizing: border-box; }
 :is(button, a, [role="button"], input):focus-visible { outline: 3px solid #c47a00; outline-offset: 4px; }
 .back-to-top-footer { margin-top: 28px; }
+.eyebrow { letter-spacing: .08em; }
+.board-voice { width: fit-content; max-width: 100%; box-sizing: border-box; margin: 0 auto 18px; padding: 12px 24px; border: 1px solid #dce1e7; border-radius: 18px 18px 18px 4px; background: #fff; }
+.voice-label { font-size: 11px; color: #68717d; }
+.board-voice .poem { margin: 6px 0 0; }
+.interlude { margin: 26px auto 0; padding-top: 20px; border-top: 1px solid #dce1e7; width: fit-content; max-width: 100%; }
+.input-whisper { margin: 0 0 20px; min-height: 1.8em; }
+.result-intro { margin: 24px 0 16px; }
+.result-intro h2 { color: #333; font-size: 22px; }
+.closing-note { margin-top: 28px; font-size: 11px; letter-spacing: .05em; }
