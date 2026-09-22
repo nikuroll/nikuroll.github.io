@@ -26,7 +26,7 @@ let press = null;
 let scrollHintShown = false;
 
 function scheduleDraw() {
-    if (!frame) frame = requestAnimationFrame(() => { frame = 0; drawArea(); });
+    if (!frame) frame = requestAnimationFrame(() => { frame = 0; drawArea(); drawPressedShadow(); });
 }
 function resizeBoard() {
     const oldRows = scroller.scrollTop / cell;
@@ -101,6 +101,17 @@ function drawArea() {
         }
     }
 }
+function drawPressedShadow() {
+    if (!press || cleared || showAll) return;
+    const { col, row } = press;
+    if (col < 0 || col >= 5 || row < 0n) return;
+    if (opened.has(puzzle.panelId(row, col))) return;
+    const localRow = Number(row - baseRow);
+    const y = localRow * cell - scroller.scrollTop;
+    if (y + cell <= 0 || y >= boardHeight) return;
+    context.fillStyle = `rgba(0, 0, 0, ${100 / 255})`; // CASE47と同じ濃さ
+    context.fillRect(col * cell, y, cell, cell);
+}
 scroller.addEventListener('scroll', () => {
     const next = puzzle.rebase(baseRow, scroller.scrollTop / cell);
     if (next.base !== baseRow) {
@@ -112,14 +123,22 @@ scroller.addEventListener('scroll', () => {
 }, { passive: true });
 canvas.addEventListener('pointerdown', event => {
     if (!event.isPrimary || event.button !== 0) return;
-    press = { id: event.pointerId, x: event.clientX, y: event.clientY, lastY: event.clientY, moved: false };
+    const bounds = canvas.getBoundingClientRect();
+    press = {
+        id: event.pointerId, x: event.clientX, y: event.clientY,
+        lastY: event.clientY, moved: false,
+        col: Math.floor((event.clientX - bounds.left) / cell),
+        row: baseRow + BigInt(Math.floor((event.clientY - bounds.top + scroller.scrollTop) / cell))
+    };
     canvas.setPointerCapture?.(event.pointerId);
+    scheduleDraw();
 });
 canvas.addEventListener('pointermove', event => {
     if (!press || event.pointerId !== press.id) return;
     if (!press.moved && Math.hypot(event.clientX - press.x, event.clientY - press.y) > 8) {
         press.moved = true;
         canvas.classList.add('dragging');
+        scheduleDraw();
     }
     if (press.moved) {
         scroller.scrollTop += press.lastY - event.clientY;
@@ -154,6 +173,7 @@ function finishPointer() {
     if (press) canvas.releasePointerCapture?.(press.id);
     press = null;
     canvas.classList.remove('dragging');
+    scheduleDraw();
 }
 // 標準CASEの回答・結果フロー
 document.getElementById('answer-form').addEventListener('submit', event => {
