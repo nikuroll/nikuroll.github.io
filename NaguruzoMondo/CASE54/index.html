@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="case.css">
+    <title>Naguruzo Mondo</title>
+</head>
+<body>
+    <script src="../message-dialog.js"></script>
+
+    <div id="canvas">
+        <div id="board-scroll" tabindex="0" role="region" aria-label="下方向に続くあみだくじ">
+            <div id="board-space"><canvas id="board" aria-label="番号パネルを開くあみだくじ盤面"></canvas></div>
+        </div>
+    </div>
+
+    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+        <div id="canvas-container">
+            <div id="result-buttons" hidden>
+                <button id="share-result" type="button">Xで共有</button>
+                <button id="all-open" type="button">全部開ける</button>
+            </div>
+            <details id="explanation-message" hidden>
+                <summary>解説</summary>
+                <div id="explanation-message-body"></div>
+            </details>
+        </div>
+        <form class="quiz-container" id="answer-form">
+            <div id="remainingAttempts" class="quiz-info">残り解答回数: 3</div>
+            <input type="text" id="answerInput" class="quiz-input" placeholder="解答を入力">
+            <button id="submitAnswer" class="quiz-button" type="submit">決定</button>
+        </form>
+    </div>
+
+    <footer class="back-to-top-footer">
+      <a href="../index.html" class="back-to-top-link">一覧に戻る</a>
+    </footer>
+
+    <script src="puzzle.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
