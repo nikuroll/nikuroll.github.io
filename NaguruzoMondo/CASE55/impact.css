@@ -1,0 +1,36 @@
+/* 通常時はCASE47の見た目。追加UIはパネル選択後だけ存在する。 */
+.quiz-container { box-sizing: border-box; width: 410px; max-width: 100vw; }
+.quiz-input { box-sizing: border-box; max-width: 100%; }
+#impact-dialog {
+    padding: 0; border: 0; background: transparent; color: white;
+    width: min(620px, 94vw); max-width: 94vw; overflow: visible;
+}
+#impact-dialog::backdrop { background: rgba(5, 8, 22, .78); backdrop-filter: blur(5px); }
+.impact-card {
+    --accent: #ffdf82;
+    padding: clamp(22px, 5vw, 42px); border-radius: 24px;
+    border: 1px solid #ffe3a16b; text-align: center;
+    background: radial-gradient(ellipse at 50% 0, #423259, transparent 70%), #0c101f;
+    box-shadow: 0 0 80px #aa78ff38, inset 0 1px 0 #ffffff38;
+    animation: impact-enter .24s cubic-bezier(.16, 1, .3, 1);
+}
+.impact-eyebrow { color: #c2b5d5; font: 700 11px/1.5 Arial, sans-serif; letter-spacing: .32em; }
+.impact-title { margin: 10px 0 28px; font: 900 clamp(30px, 7vw, 54px)/1 Arial, sans-serif; font-style: italic; letter-spacing: -.05em; color: var(--accent); text-shadow: 0 0 28px #ffdc7d60; }
+.impact-track { height: 54px; position: relative; margin: 0 0 12px; border-radius: 9px; border: 1px solid #ffffff40; box-shadow: 0 0 28px #b169ff40; }
+.impact-zones { position: absolute; inset: 0; overflow: hidden; border-radius: 8px; display: flex; }
+.impact-zone { height: 100%; box-shadow: inset 1px 0 #ffffff40; }
+.impact-center { position: absolute; left: 50%; top: -15px; bottom: -15px; width: 1px; background: #fff8d4; box-shadow: 0 0 4px #ffec9890; }
+.impact-needle { position: absolute; top: -9px; bottom: -9px; width: 4px; margin-left: -2px; background: white; border-radius: 2px; box-shadow: 0 0 12px 4px #ffffffb0; will-change: left; }
+.impact-needle::before { content: ''; position: absolute; top: -9px; left: -5px; border: 7px solid transparent; border-top-color: white; }
+.impact-scale { display: flex; justify-content: space-between; font: 700 10px/1 Arial, sans-serif; color: #a5abc0; }
+.impact-scale span:nth-child(2) { color: #ffeaa6; }
+.impact-stop { margin-top: 30px; width: 100%; border: 1px solid #fff2b0; border-radius: 10px; padding: 16px; color: #271c18; background: linear-gradient(#fff0b3, #ffbb54); box-shadow: 0 5px 0 #805122, 0 8px 30px #ffbd4338; font: 900 20px/1 Arial, sans-serif; letter-spacing: .2em; cursor: pointer; touch-action: manipulation; }
+.impact-stop:active { transform: translateY(3px); box-shadow: 0 2px 0 #805122; }
+.impact-stop:disabled { cursor: default; }
+.impact-stop:focus-visible { outline: 3px solid white; outline-offset: 5px; }
+.impact-result { min-height: 22px; margin-top: 20px; font: 700 14px/1.5 Arial, sans-serif; color: var(--accent); letter-spacing: .1em; }
+.impact-card.is-hit { animation: impact-hit .35s ease-out; }
+#impact-fx { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; }
+@keyframes impact-enter { from { opacity: 0; transform: scale(.84) translateY(25px); } to { opacity: 1; transform: none; } }
+@keyframes impact-hit { 0% { transform: scale(1.055); filter: brightness(1.8); } 100% { transform: none; filter: none; } }
+@media (prefers-reduced-motion: reduce) { .impact-card, .impact-card.is-hit { animation: none; } }
