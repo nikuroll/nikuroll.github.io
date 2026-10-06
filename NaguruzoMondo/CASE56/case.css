@@ -1,0 +1,23 @@
+#canvas, .case-controls { width: min(800px, calc(100vw - 32px)); }
+#canvas { align-items: stretch; margin-top: 16px; }
+#dig-board { display: block; width: 100%; height: auto; touch-action: none; cursor: crosshair; }
+.excavation-status { display: grid; grid-template-columns: auto 1fr 1fr; gap: 12px; align-items: center; margin-bottom: 10px; color: #40372d; font-size: 14px; font-weight: bold; }
+.fossil-meter { height: 10px; background: #d8dfe2; border-radius: 8px; overflow: hidden; }
+.fossil-meter span { display: block; height: 100%; width: 0; background: #239fbd; transition: width .1s; }
+.damage-meter span { background: #d24b42; }
+.tools { display: flex; gap: 8px; margin: 12px 0 18px; }
+.tools button { flex: 1; min-height: 48px; padding: 8px 4px; border: 2px solid #bdb2a2; border-radius: 8px; background: #fffaf0; color: #453f36; font-size: 16px; cursor: pointer; }
+.tools button[aria-pressed="true"] { background: #564938; color: white; border-color: #564938; }
+.tools button:disabled { opacity: .6; cursor: default; }
+button:focus-visible, summary:focus-visible { outline: 3px solid #21a7ca; outline-offset: 3px; }
+.quiz-container { box-sizing: border-box; width: 100%; }
+.quiz-input { box-sizing: border-box; max-width: 100%; }
+#result-buttons { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin: 20px 0; }
+#result-buttons button { padding: 10px 20px; min-height: 44px; border: none; border-radius: 5px; background: #007bff; color: #fff; font-size: 16px; cursor: pointer; }
+#result-buttons button:last-child { background: #28a745; }
+#result-buttons button:disabled { background: #6c757d; cursor: default; }
+#explanation-message { margin-top: 16px; padding: 12px 14px; border: 1px solid #0002; border-radius: 8px; background: #fffffff2; box-shadow: 0 6px 18px #0001; font-size: 14px; line-height: 1.6; }
+#explanation-message summary { cursor: pointer; font-weight: bold; }
+#explanation-message-body { white-space: pre-wrap; margin-top: 8px; }
+@media (max-width: 420px) { .tools button { font-size: 14px; } .excavation-status { gap: 8px; font-size: 13px; } .quiz-container { padding: 22px 16px; } }
+@media (prefers-reduced-motion: reduce) { .fossil-meter span { transition: none; } }
