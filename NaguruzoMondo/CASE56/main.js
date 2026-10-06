@@ -118,14 +118,8 @@ function drawBoard(now = performance.now()) {
         const x = i % size * unit, y = Math.floor(i / size) * unit, cover = field.cover[i];
         if (cover) rock.drawImage(rockTextures[cover], x, y, unit, unit, x, y, unit, unit);
         if (!cover && field.alpha[i] && field.damage[i]) {
-            const offset = field.noise(i * 151) * .6;
-            scarContext.strokeStyle = `rgba(151,43,28,${field.damage[i] * .7})`;
-            scarContext.lineWidth = 1.2;
-            scarContext.beginPath();
-            scarContext.moveTo(x + unit * offset, y);
-            scarContext.lineTo(x + unit * (1 - offset), y + unit * .55);
-            scarContext.lineTo(x + unit * offset, y + unit);
-            scarContext.stroke();
+            scarContext.fillStyle = '#000000';
+            scarContext.fillRect(x, y, unit, unit);
         }
     }
     scarContext.globalCompositeOperation = 'destination-in';
