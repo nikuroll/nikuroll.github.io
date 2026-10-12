@@ -1,0 +1,28 @@
+setup*
+.gitignore
+agent/*
+.github
+lyrics.txt
+AGENTS.md
+*/README.md
+*.test.js
+*.test.cjs
+*.spec.js
+*.spec.cjs
+**/test/
+**/tests/
+**/__tests__/
+
+# Node.js / dynamic app
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.env
+.env.*
+.DS_Store
+case40-live/
+
+# CASE57 development-only stroke extraction helper
+/CASE57/tools/
