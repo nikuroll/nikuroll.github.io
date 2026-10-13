@@ -1,9 +1,15 @@
 'use strict';
-// Standard CASE answer/result flow copied from the former CASE57 (now CASE58).
-const config = { caseId: 57, answers: ['す', 'ス'], hint: '',
-    explanation: '答えは「す」です。' };
+const config = { caseId: 57, answers: ['す', 'ス', '酢'], hint: '',
+    explanation: '文字列として考えます。「たばすこ」の４文字には「す」が入っているので、答えは酢です。クイズ的には本物のタバスコには塩と酢が入っていますが、答えが被ってしまっているので別の解答として認めません' };
 const letters = Array.from(StrokeQuestion.text);
 const paths = letters.map(char => StrokeQuestion.glyphs[char].map(d => new Path2D(d)));
+const strokeLengths = letters.map(char => StrokeQuestion.glyphs[char].map(d => {
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', d); return path.getTotalLength();
+}));
+const strokeDuration = 360;
+const strokeStarts = letters.map(() => []);
+let animationFrame = 0;
 const counts = Array(25).fill(0);
 const canvas = document.getElementById('board'), context = canvas.getContext('2d');
 const boardSize = 640, cellSize = boardSize / 5;
@@ -26,6 +32,7 @@ function snapshot() {
         grid: counts.map(n => n ? '⬜' : '🟨'), counts: [...counts], attempt: 4 - remainingAttempts };
 }
 function drawArea() {
+    const now = performance.now();
     context.fillStyle = 'white'; context.fillRect(0, 0, boardSize, boardSize);
     for (let i = 0; i < 25; i++) {
         const x = i % 5 * cellSize, y = Math.floor(i / 5) * cellSize;
@@ -50,9 +57,28 @@ function drawArea() {
         context.scale(cellSize * .88 / 109, cellSize * .88 / 109);
         context.strokeStyle = '#000'; context.lineWidth = 3;
         context.lineCap = context.lineJoin = 'round';
-        for (const path of paths[i].slice(0, showAll ? paths[i].length : counts[i])) context.stroke(path);
+        for (let stroke = 0; stroke < (showAll ? paths[i].length : counts[i]); stroke++) {
+            const progress = showAll || cleared ? 1 : Math.max(0, Math.min(1, (now - strokeStarts[i][stroke]) / strokeDuration));
+            if (progress === 0) continue;
+            if (progress < 1) {
+                const length = strokeLengths[i][stroke];
+                context.setLineDash([length, length]);
+                context.lineDashOffset = length * (1 - progress);
+            }
+            context.stroke(paths[i][stroke]);
+            context.setLineDash([]); context.lineDashOffset = 0;
+        }
         context.restore();
     }
+    return now;
+}
+function animateStrokes() {
+    if (animationFrame || cleared || showAll) return;
+    animationFrame = requestAnimationFrame(() => {
+        animationFrame = 0;
+        const now = drawArea();
+        if (strokeStarts.some(starts => starts.length && starts[starts.length - 1] + strokeDuration > now)) animateStrokes();
+    });
 }
 function cellAt(event) {
     const box = canvas.getBoundingClientRect();
@@ -74,7 +100,10 @@ canvas.addEventListener('pointerup', event => {
     if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
     if (cleared || current.moved || current.index < 0 || cellAt(event) !== current.index) return;
     if (counts[current.index] < paths[current.index].length) {
+        const starts = strokeStarts[current.index];
+        starts.push(performance.now());
         counts[current.index]++; drawArea();
+        animateStrokes();
     }
 });
 for (const name of ['pointercancel', 'lostpointercapture']) canvas.addEventListener(name, () => { press = null; });
@@ -82,7 +111,7 @@ window.addEventListener('blur', () => { press = null; });
 
 function make_tweet(result) {
     const rows = Array.from({ length: 5 }, (_, row) => result.grid.slice(row * 5, row * 5 + 5).join('')).join('\n');
-    return `CASE${config.caseId}\n\nScore: ${result.score}/25 (${result.attempt}回目)\n${rows}\n#NaguruzoMondo\n${location.href.split(/[?#]/)[0]}`;
+    return `CASE${config.caseId}\n\nScore: ${result.score}/25 (${result.attempt}回目)\n${rows}\n#NaguruzoMondo #IkkakuKaito\n${location.href.split(/[?#]/)[0]}`;
 }
 function showExplanationMessageOnScreen() {
     if (document.getElementById('explanation-message')) return;
@@ -108,6 +137,7 @@ function submitAnswer() {
     const answer = document.getElementById('answerInput').value.trim().normalize('NFKC');
     if (config.answers.includes(answer)) {
         finalResult = snapshot(); cleared = true; press = null;
+        cancelAnimationFrame(animationFrame); animationFrame = 0;
         drawArea(); showResultButtons(finalResult); window.showCaseMessage('正解！');
     } else {
         remainingAttempts--;
