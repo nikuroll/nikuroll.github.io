@@ -326,5 +326,8 @@ function submitAnswer() {
 }
 document.getElementById('submitAnswer').addEventListener('click', submitAnswer);
 document.getElementById('answerInput').addEventListener('keydown', event => {
-    if (event.key === 'Enter' && !event.isComposing && event.keyCode !== 229) submitAnswer();
+    if (event.key === 'Enter' && !event.isComposing && event.keyCode !== 229) {
+        event.preventDefault();
+        submitAnswer();
+    }
 });

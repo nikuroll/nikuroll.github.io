@@ -260,7 +260,10 @@ if (submitButton) {
 const answerInput = document.getElementById("answerInput");
 if (answerInput) {
     answerInput.addEventListener("keydown", event => {
-        if (event.key === "Enter") submitButton.click();
+        if (event.key === "Enter" && !event.isComposing && event.keyCode !== 229) {
+            event.preventDefault();
+            submitButton.click();
+        }
     });
 }
 
