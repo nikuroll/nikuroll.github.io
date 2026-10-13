@@ -1,5 +1,6 @@
 #canvas { width: min(800px, 100vh, calc(100vw - 32px)); align-items: stretch; }
 #board { display: block; width: 100%; height: auto; touch-action: manipulation; cursor: pointer; }
+#board:not([data-ready]) { visibility: hidden; }
 .quiz-container { box-sizing: border-box; width: min(410px, calc(100vw - 32px)); margin-top: 8px; }
 #canvas-container { max-width: 100vw; }
 #score { text-align: center; color: #333; font-weight: bold; }

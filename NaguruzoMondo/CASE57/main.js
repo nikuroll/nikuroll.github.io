@@ -1,6 +1,6 @@
 'use strict';
 const config = { caseId: 57, answers: ['す', 'ス', '酢'], hint: '',
-    explanation: '文字列として考えます。「たばすこ」の４文字には「す」が入っているので、答えは酢です。クイズ的には本物のタバスコには塩と酢が入っていますが、答えが被ってしまっているので別の解答として認めません' };
+    explanation: '文字列として考えます。「たばすこ」の４文字には「す」が入っているので、答えは酢です。クイズ的には本物のタバスコには塩と酢が入っていますが、答え被りを起こしているので別の解答として認めません' };
 const letters = Array.from(StrokeQuestion.text);
 const paths = letters.map(char => StrokeQuestion.glyphs[char].map(d => new Path2D(d)));
 const strokeLengths = letters.map(char => StrokeQuestion.glyphs[char].map(d => {
@@ -19,19 +19,25 @@ context.setTransform(density, 0, 0, density, 0, 0);
 context.imageSmoothingQuality = 'high';
 let cleared = false, remainingAttempts = 3, showAll = false, finalResult = null;
 let press = null;
-const plainPanel = new Image();
-plainPanel.onload = drawArea;
-plainPanel.src = 'images/panel.PNG';
-const panelImages = counts.map((_, index) => {
-    const image = new Image(); image.onload = drawArea;
-    image.src = `../images/pic(${index + 26}).PNG`; return image;
-});
+let boardReady = false;
+const imageLoads = [];
+function loadPanel(src) {
+    const image = new Image();
+    imageLoads.push(new Promise(resolve => {
+        image.onload = image.onerror = resolve;
+        image.src = src;
+    }));
+    return image;
+}
+const plainPanel = loadPanel('images/panel.PNG');
+const panelImages = counts.map((_, index) => loadPanel(`../images/pic(${index + 26}).PNG`));
 
 function snapshot() {
     return { score: 25 - counts.reduce((sum, n) => sum + n, 0),
         grid: counts.map(n => n ? '⬜' : '🟨'), counts: [...counts], attempt: 4 - remainingAttempts };
 }
 function drawArea() {
+    if (!boardReady) return;
     const now = performance.now();
     context.fillStyle = 'white'; context.fillRect(0, 0, boardSize, boardSize);
     for (let i = 0; i < 25; i++) {
@@ -87,7 +93,7 @@ function cellAt(event) {
     return Math.floor(y * 5) * 5 + Math.floor(x * 5);
 }
 canvas.addEventListener('pointerdown', event => {
-    if (cleared || press || !event.isPrimary || event.button !== 0) return;
+    if (!boardReady || cleared || press || !event.isPrimary || event.button !== 0) return;
     press = { id: event.pointerId, index: cellAt(event), x: event.clientX, y: event.clientY, moved: false };
     canvas.setPointerCapture(event.pointerId);
 });
@@ -149,4 +155,8 @@ document.getElementById('submitAnswer').addEventListener('click', submitAnswer);
 document.getElementById('answerInput').addEventListener('keydown', event => {
     if (event.key === 'Enter' && !event.isComposing && event.keyCode !== 229) submitAnswer();
 });
-drawArea();
+Promise.all([...imageLoads, document.fonts.ready]).then(() => {
+    boardReady = true;
+    drawArea();
+    canvas.dataset.ready = '';
+});
