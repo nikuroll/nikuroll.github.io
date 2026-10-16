@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#f4f2ec"><meta name="description" content="取った石が自分の色になるCPU対戦の囲碁ゲーム。"><title>新しい囲碁、あたらし囲碁</title><link rel="icon" href="./favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="./src/style.css"></head><body>
+<div class="app">
+<nav class="utility" aria-label="お問い合わせ"><button id="contact-open" type="button">お問い合わせ</button></nav>
+<header><a class="brand" href="./" aria-label="新しい囲碁、あたらし囲碁 ホーム"><span class="brand-mark">●<i>○</i></span><h1><span>新しい囲碁、</span><span>あたらし囲碁</span></h1></a><button id="rules-open" class="text-button">遊び方 <span class="help">?</span></button></header>
+<main>
+<section class="game" aria-label="囲碁対局">
+<div class="settings"><span class="match-label">CPU対戦</span><label class="size-label"><span>盤面</span><select id="size" aria-label="盤面サイズ"><option value="7">7路盤</option><option value="9" selected>9路盤</option><option value="13">13路盤</option></select></label></div>
+<div class="players"><div id="black-player" class="player active"><span class="mini-stone black"></span><div><span id="black-name">CPU</span><small>黒・先手</small></div><strong id="black-count">0</strong><span class="unit">石</span></div><span class="versus">対</span><div id="white-player" class="player"><span class="mini-stone white"></span><div><span id="white-name">あなた</span><small>白・後手</small></div><span class="player-score"><strong id="white-count">0</strong><span class="unit">石</span><span id="white-komi" class="score-komi" hidden></span></span></div></div>
+<div class="board-wrap"><div id="board" class="board" tabindex="-1" role="group" aria-label="9路盤"></div><div id="result" class="result" role="region" aria-labelledby="result-title" tabindex="-1" hidden><div class="result-card"><div class="eyebrow">対局結果</div><h2 id="result-title">黒の勝ち</h2><p id="result-score"></p><div class="result-actions"><a id="share-x" class="share-x" target="_blank" rel="noopener noreferrer">Xで共有する</a></div><button id="lottery-open" class="secondary wide" hidden>コミくじ</button><button id="play-again" class="text-button replay">もう一局</button></div></div></div>
+<div class="status-row"><span id="status" role="status" aria-live="polite">CPUの手番です</span><span class="move-count"><b id="moves">0</b><span id="total"> / 81 手</span></span></div>
+<div class="progress"><div id="progress-bar"></div></div>
+<div class="actions"><button id="undo" class="secondary">↶ <span>一手戻す</span></button><button id="sound" class="sound" aria-label="効果音をオフにする" aria-pressed="true">音 ON</button></div>
+
+</section>
+
+</main></div>
+<dialog id="rules"><div class="dialog-heading"><h2>遊び方</h2><button id="rules-close" aria-label="閉じる">✕</button></div><p class="rule-lead">石を取ったとき、相手の石は取り除かれず、<strong>自分の色になります。</strong></p><ol><li>黒から交互に、空いている交点へ石を置きます。上下左右につながる同じ色の石はひとつのまとまりです。</li><li>置いた石の上下左右に接する相手のまとまりは、隣接する空点（呼吸点）がなくなると自分の色に変わります。</li><li>相手の石を取れず、置いた石が相手の石に上下左右で接している場合、自分のまとまりの呼吸点がなくなると、そのまとまりが相手の色に変わります（自殺手）。</li><li>自分の陣地の内側に石を置いても自殺手にはなりません。置いた石の上下左右に相手の石がなければ、最後の呼吸点を埋めても自分の色のままです。</li><li>反転後にさらに反転を繰り返すことはありません。パス・コウ・石の除去はありません。</li><li>盤面が埋まったら石を数え、多い側の勝ちです。</li></ol><p class="rule-note">あなたは白、CPUは黒です。「一手戻す」は、直前のあなたの手番まで戻ります。</p><button id="rules-done" class="primary wide">対局へ</button></dialog>
+<dialog id="lottery" aria-labelledby="lottery-title"><div class="dialog-heading"><h2 id="lottery-title">コミくじ</h2><button id="lottery-close" aria-label="閉じる">✕</button></div><p id="lottery-balance"></p><table class="prize-table"><thead><tr><th scope="col">等級</th><th scope="col">コミ</th><th scope="col">当選確率</th></tr></thead><tbody id="lottery-prizes"></tbody></table><button id="lottery-draw" class="primary wide">10目で引く</button></dialog>
+<dialog id="contact" aria-labelledby="contact-title"><div class="dialog-heading"><h2 id="contact-title">お問い合わせ</h2><button id="contact-close" aria-label="閉じる">✕</button></div><form id="contact-form" method="dialog"><label class="contact-field">お問い合わせの種類<select id="contact-topic"><option value="">選択してください</option></select></label><label id="contact-detail-label" class="contact-field" hidden>お問い合わせの内容<select id="contact-detail"></select></label><p id="contact-message" class="dialog-message" role="status"></p></form></dialog>
+<dialog id="confirm"><h2>新しい対局を始めますか？</h2><p>現在の対局はリセットされます。</p><div class="confirm-actions"><button id="cancel-change" class="secondary">続ける</button><button id="accept-change" class="primary">新しく始める</button></div></dialog>
+<div id="final-caption" aria-hidden="true"><span>終局</span></div>
+<dialog id="tutorial" aria-labelledby="tutorial-title" aria-describedby="tutorial-description">
+<div class="tutorial-top"><span>遊び方</span><span id="tutorial-step">1 / 2</span></div>
+<h2 id="tutorial-title">石は交点に置きます</h2>
+<p id="tutorial-description">印のある交点をタップしてみてください。</p>
+<div id="tutorial-board" class="board tutorial-board" role="group" aria-label="練習用の5路盤"></div>
+<p id="tutorial-feedback" role="status" aria-live="polite"></p>
+<button id="tutorial-next" class="primary wide" disabled>次へ</button>
+</dialog>
+<dialog id="bonus-popup" aria-labelledby="bonus-title" aria-describedby="bonus-detail"><h2 id="bonus-title"></h2><p id="bonus-detail" hidden></p><button id="bonus-close" class="primary wide" autofocus>閉じる</button></dialog>
+<script type="module" src="./src/app.js"></script></body></html>
