@@ -5,7 +5,7 @@ window.LiveScore = {
         if (!enabled) return { update() {}, hide() {} };
         const element = document.createElement('p');
         element.id = 'live-score';
-        anchor.insertAdjacentElement('afterend', element);
+        anchor.insertAdjacentElement('beforebegin', element);
         const display = {
             update() {
                 if (element.hidden) return;

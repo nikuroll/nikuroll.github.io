@@ -2,7 +2,8 @@
 // CASE47-derived standard answer/result flow; replace material here.
 const config = { caseId: 58, image: 'images/pic(26).PNG',
     showLiveScore: true, // falseにするとリアルタイム表示を完全に外せる。
-    answers: ['だいどうしょうい', '大同小異'], hint: '', explanation: '特にありません' };
+    answers: ['らいぶはうす', 'ライブハウス'], hint: 'イラストを見ると光加減が違うようです。明るいを指す英単語は「ブライト」なのでこれを使って明るさを比較しましょう。「↓」にも文字が入ります。', 
+    explanation: 'イラストを見ると光加減が違うようです。明るいを指す英単語は「ブライト」なのでこれを使って明るさを比較しましょう。「↓」にも文字が入ります。右から「ブライト」「ブライター」「ブライテスト」となり答えは「ライブハウス」です。' };
 const { MovingBoard, PANEL_SIZE } = MovingPanels;
 const model = new MovingBoard();
 const liveScore = LiveScore.create({ enabled: config.showLiveScore,
@@ -160,11 +161,15 @@ function submitAnswer() {
     } else {
         remainingAttempts--;
         document.getElementById('remainingAttempts').textContent = `残り解答回数: ${remainingAttempts}`;
-        window.showCaseMessage('ちがいます。' + config.hint);
+        const hint = model.panels.every(panel => panel.active) ? config.hint : '';
+        window.showCaseMessage('ちがいます。' + hint);
     }
 }
 document.getElementById('submitAnswer').addEventListener('click', submitAnswer);
 document.getElementById('answerInput').addEventListener('keydown', event => {
-    if (event.key === 'Enter' && !event.isComposing && event.keyCode !== 229) submitAnswer();
+    if (event.key === 'Enter' && !event.isComposing && event.keyCode !== 229) {
+        event.preventDefault();
+        submitAnswer();
+    }
 });
 drawArea();
