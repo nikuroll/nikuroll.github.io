@@ -1,0 +1,4 @@
+.quiz-container { max-width: calc(100vw - 92px); }
+#canvas canvas { touch-action: pan-y; }
+#score, #live-score { text-align: center; color: #333; font-weight: bold; }
+#live-score { margin: 10px 0; font-variant-numeric: tabular-nums; }
