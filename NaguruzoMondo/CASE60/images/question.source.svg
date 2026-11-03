@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000" viewBox="0 0 1000 1000">
+  <defs>
+    <marker id="red" markerWidth="4" markerHeight="4" refX="3.5" refY="2" orient="auto"><path d="M0 0 4 2 0 4Z" fill="#d94151"/></marker>
+    <marker id="blue" markerWidth="4" markerHeight="4" refX="3.5" refY="2" orient="auto"><path d="M0 0 4 2 0 4Z" fill="#2878cc"/></marker>
+    <marker id="green" markerWidth="4" markerHeight="4" refX="3.5" refY="2" orient="auto"><path d="M0 0 4 2 0 4Z" fill="#26945b"/></marker>
+  </defs>
+  <rect width="1000" height="1000" fill="white"/>
+  <g fill="none" stroke="#222" stroke-width="3">
+    <rect x="40" y="65" width="220" height="220"/>
+    <rect x="40" y="330" width="220" height="220"/>
+    <rect x="40" y="595" width="220" height="220"/>
+    <path d="M285 175H345m-18-18 18 18-18 18M285 440H345m-18-18 18 18-18 18M285 705H345m-18-18 18 18-18 18"/>
+  </g>
+  <g fill="white" stroke="#222" stroke-width="3.5">
+    <circle cx="440" cy="175" r="31"/><circle cx="545" cy="175" r="31"/>
+    <circle cx="440" cy="440" r="31"/><circle cx="545" cy="440" r="31"/><circle cx="650" cy="440" r="31"/><circle cx="755" cy="440" r="31"/>
+    <circle cx="440" cy="705" r="31"/><circle cx="545" cy="705" r="31"/><circle cx="650" cy="705" r="31"/>
+  </g>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="5">
+    <path d="M545 175V275H375V640L440 705V790H850" stroke="#d94151" marker-end="url(#red)"/>
+    <path d="M650 705H545L495 655V535H755V440H650V320H840V380" stroke="#2878cc" marker-end="url(#blue)"/>
+    <path d="M440 440H545V300L440 175H395V260L545 440L590 495H805V175H845" stroke="#26945b" marker-end="url(#green)"/>
+  </g>
+  <g fill="#d94151"><circle cx="545" cy="175" r="6"/></g>
+  <g fill="#2878cc"><circle cx="650" cy="705" r="6"/></g>
+  <g fill="#26945b"><circle cx="440" cy="440" r="6"/></g>
+  <g stroke="#3a302b" stroke-width="3" stroke-linejoin="round">
+    <path d="M853 108H955V247H853Z" fill="#d7bda1"/>
+    <path d="M868 123H940V247H868Z" fill="#fff7df"/>
+    <path d="M868 123 918 138V247H868Z" fill="#a6744e"/>
+    <circle cx="908" cy="192" r="3" fill="#f3dc93"/>
+    <path d="M838 247H970L953 267H852Z" fill="#d6d6d6"/>
+    <path d="M870 480Q853 468 862 451Q846 432 861 414Q852 392 872 382Q879 365 903 368Q932 364 944 386Q960 399 950 418Q963 435 950 451Q960 469 944 481Q950 502 932 510H873Q855 501 870 480Z" fill="#e9bd59"/>
+    <path d="M887 469V490H919V469" fill="#f5cfb4"/>
+    <path d="M855 550Q853 489 884 486L902 498 921 486Q951 490 953 550Z" fill="#d4b0d9"/>
+    <path d="M884 486L902 498 890 515 877 491M921 486L902 498 915 515 929 491" fill="#fff7ed"/>
+    <ellipse cx="903" cy="431" rx="31" ry="42" fill="#ffdfc7"/>
+    <path d="M871 420Q864 376 901 375Q940 373 936 417Q920 409 907 392Q896 414 871 420Z" fill="#f4d276"/>
+    <path d="M873 419Q862 430 874 442Q862 454 876 467Q865 482 878 493M933 417Q945 430 934 443Q946 455 932 468Q944 482 931 494" fill="none" stroke="#bd8d36"/>
+    <path d="M877 393Q901 373 931 393" fill="none" stroke="#895095" stroke-width="6"/>
+    <path d="M928 388Q934 365 946 377L943 391Q962 374 965 390L946 399Z" fill="#b775bc"/>
+    <path d="M884 424L891 422M915 422L922 424" fill="none" stroke-linecap="round" stroke-width="2"/>
+    <ellipse cx="888" cy="432" rx="2.8" ry="4" fill="#4c89a8" stroke="none"/>
+    <ellipse cx="918" cy="432" rx="2.8" ry="4" fill="#4c89a8" stroke="none"/>
+    <path d="M897 452q8 4 15-2" fill="none" stroke-linecap="round" stroke-width="2"/>
+  </g>
+  <svg x="857" y="744" width="112" height="112" viewBox="62 32 207 207"><image width="331" height="316" href="hatena.png"/></svg>
+  <text x="500" y="945" text-anchor="middle" font-family="'07ロゴたいぷゴシック7'" font-size="84.674746" fill="#000">この囲碁用語は？</text>
+</svg>
