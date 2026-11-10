@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000" viewBox="0 0 1000 1000">
+  <rect width="1000" height="1000" fill="white"/>
+  <image href="face.svg" x="-200" y="-435" width="1400" height="1400"/>
+  <text x="500" y="868" text-anchor="middle" font-family="'07ロゴたいぷゴシック7'" font-size="76" fill="#000">○○○○が○○○○</text>
+  <text x="500" y="970" text-anchor="middle" font-family="'07ロゴたいぷゴシック7'" font-size="84.674746" fill="#000">この回文は？</text>
+</svg>
