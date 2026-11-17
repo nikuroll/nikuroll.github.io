@@ -1,0 +1,9 @@
+#canvas canvas { touch-action: pan-y; }
+
+.bomb-warning-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
